@@ -1,10 +1,22 @@
-Số lượng thành viên : 5
-075205022301 | Trần Hữu Lợi | tranhuuloi200510@gmail.com
+# EV Dealer - Customer Module (Backend API)
 
-066305014642 | Nguyễn Như Quỳnh | quynhnn4642@ut.edu.vn
+This project provides REST APIs for Customers, Test Drives and Feedbacks based on existing database schema `ev_dealer_management_db`.
 
-056205007413 | Trần Minh Phước | tranminhphuoc1564@gmail.com
+## Quick start
 
-083205006374 |Lương Quốc An | bossan321@gmail.com
+1. Make sure MySQL is running and you have created the database `ev_dealer_management_db`. You can import the provided SQL file (`ev_dealer_management_db.sql`) into your MySQL server.
+2. Configure MySQL credentials in `src/main/resources/application.properties` if different.
+3. Build and run:
+   ```bash
+   mvn clean install
+   mvn spring-boot:run
+   ```
+4. APIs:
+   - `GET /api/customers`
+   - `GET /api/customers/{id}`
+   - `POST /api/customers`
+   - `PUT /api/customers/{id}`
+   - `DELETE /api/customers/{id}`
+   - Similar endpoints for `/api/testdrives` and `/api/feedbacks`
 
-| Huỳnh Đặng Hoàn Nguyên | nguyenhdh1760@ut.edu.vn
+Note: `spring.jpa.hibernate.ddl-auto=none` because database schema is provided.
