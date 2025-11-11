@@ -1,1 +1,4 @@
 D:\EVDMS\modules\dealer-module\src\main\java\com\evdms\evm\model\Vehicle.java
+D:\EVDMS\modules\dealer-module\src\main\java\com\evdms\evm\repository\VehicleRepository.java
+D:\EVDMS\modules\dealer-module\src\main\java\com\evdms\evm\controller\VehicleController.java
+D:\EVDMS\modules\dealer-module\src\main\java\com\evdms\evm\service\VehicleService.java

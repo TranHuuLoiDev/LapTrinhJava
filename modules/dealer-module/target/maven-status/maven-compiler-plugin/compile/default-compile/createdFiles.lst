@@ -1,1 +1,4 @@
+com\evdms\evm\repository\VehicleRepository.class
+com\evdms\evm\controller\VehicleController.class
 com\evdms\evm\model\Vehicle.class
+com\evdms\evm\service\VehicleService.class
