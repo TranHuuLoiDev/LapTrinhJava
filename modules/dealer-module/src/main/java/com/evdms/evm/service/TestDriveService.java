@@ -23,15 +23,18 @@ public class TestDriveService {
         return testDriveRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public TestDrive getTestDriveById(Long id) {
         Optional<TestDrive> testDrive = testDriveRepository.findById(id);
         return testDrive.orElse(null);
     }
 
+    @SuppressWarnings("null")
     public TestDrive saveTestDrive(TestDrive testDrive) {
         return testDriveRepository.save(testDrive);
     }
 
+    @SuppressWarnings("null")
     public TestDrive updateTestDrive(Long id, TestDrive updatedTestDrive) {
         return testDriveRepository.findById(id)
                 .map(testDrive -> {
@@ -49,6 +52,7 @@ public class TestDriveService {
                         "TestDrive not found with id " + id));
     }
 
+    @SuppressWarnings("null")
     public void deleteTestDrive(Long id) {
         if (!testDriveRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "TestDrive not found with id " + id);

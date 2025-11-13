@@ -22,15 +22,18 @@ public class DealerPayableService {
         return dealerPayableRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public DealerPayable getDealerPayableById(Long id) {
         return dealerPayableRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "DealerPayable not found with id " + id));
     }
 
+    @SuppressWarnings("null")
     public DealerPayable saveDealerPayable(DealerPayable dealerPayable) {
         return dealerPayableRepository.save(dealerPayable);
     }
 
+    @SuppressWarnings("null")
     public DealerPayable updateDealerPayable(Long id, DealerPayable updatedPayable) {
         return dealerPayableRepository.findById(id)
                 .map(payable -> {
@@ -44,6 +47,7 @@ public class DealerPayableService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "DealerPayable not found with id " + id));
     }
 
+    @SuppressWarnings("null")
     public void deleteDealerPayable(Long id) {
         if (!dealerPayableRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "DealerPayable not found with id " + id);

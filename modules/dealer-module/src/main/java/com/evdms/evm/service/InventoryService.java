@@ -22,15 +22,18 @@ public class InventoryService {
         return inventoryRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Inventory getInventoryById(Long id) {
         return inventoryRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventory not found with id " + id));
     }
 
+    @SuppressWarnings("null")
     public Inventory saveInventory(Inventory inventory) {
         return inventoryRepository.save(inventory);
     }
 
+    @SuppressWarnings("null")
     public Inventory updateInventory(Long id, Inventory updatedInventory) {
         return inventoryRepository.findById(id)
                 .map(inv -> {
@@ -44,6 +47,7 @@ public class InventoryService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventory not found with id " + id));
     }
 
+    @SuppressWarnings("null")
     public void deleteInventory(Long id) {
         if (!inventoryRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventory not found with id " + id);

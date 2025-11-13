@@ -22,15 +22,18 @@ public class FeedbackService {
         return feedbackRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Feedback getFeedbackById(Long id) {
         return feedbackRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Feedback not found with id " + id));
     }
 
+    @SuppressWarnings("null")
     public Feedback saveFeedback(Feedback feedback) {
         return feedbackRepository.save(feedback);
     }
 
+    @SuppressWarnings("null")
     public Feedback updateFeedback(Long id, Feedback updatedFeedback) {
         return feedbackRepository.findById(id)
                 .map(feedback -> {
@@ -46,6 +49,7 @@ public class FeedbackService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Feedback not found with id " + id));
     }
 
+    @SuppressWarnings("null")
     public void deleteFeedback(Long id) {
         if (!feedbackRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Feedback not found with id " + id);

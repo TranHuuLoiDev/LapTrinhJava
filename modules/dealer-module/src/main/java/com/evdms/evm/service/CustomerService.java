@@ -24,12 +24,14 @@ public class CustomerService {
     }
 
     // GET by ID
+    @SuppressWarnings("null")
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
     }
 
     // POST
+    @SuppressWarnings("null")
     public Customer saveCustomer(Customer customer) {
         return customerRepository.save(customer);
     }
@@ -45,7 +47,10 @@ public class CustomerService {
     }
 
     // DELETE
+    @SuppressWarnings("null")
+
     public void deleteCustomer(Long id) {
+        
         if (!customerRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found");
         }

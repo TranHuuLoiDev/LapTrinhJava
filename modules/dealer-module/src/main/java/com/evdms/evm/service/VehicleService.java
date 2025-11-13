@@ -24,15 +24,18 @@ public class VehicleService {
         return vehicleRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Vehicle getVehicleById(Long id) {
         Optional<Vehicle> vehicle = vehicleRepository.findById(id);
         return vehicle.orElse(null); // hoặc ném exception nếu muốn
     }
 
+    @SuppressWarnings("null")
     public Vehicle saveVehicle(Vehicle vehicle) {
     return vehicleRepository.save(vehicle);
     }
 
+    @SuppressWarnings("null")
     public Vehicle updateVehicle(Long id, Vehicle updatedVehicle) {
     return vehicleRepository.findById(id)
         .map(vehicle -> {
@@ -49,6 +52,7 @@ public class VehicleService {
 
     }
 
+    @SuppressWarnings("null")
     public void deleteVehicle(Long id) {
     if (!vehicleRepository.existsById(id)) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found with id " + id);

@@ -1,43 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVDMS - Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="admin-container">
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2 class="logo">EVDMS</h2>
+      <nav>
+        <ul>
+          <li class="active" onclick="showPage('dashboard')">Dashboard</li>
+          <li onclick="showPage('vehicles')">Xe</li>
+          <li onclick="showPage('customers')">Khách hàng</li>
+          <li onclick="showPage('orders')">Đơn hàng</li>
+          <li onclick="showPage('feedbacks')">Phản hồi</li>
+          <li onclick="showPage('testdrives')">Lái thử</li>
+        </ul>
+      </nav>
+    </aside>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    <!-- Main -->
+    <div class="main">
+      <header class="header">
+        <h1 id="page-title">Dashboard tổng hợp</h1>
+        <div class="admin-info">
+          <span>Admin</span>
+          <img src="https://cdn-icons-png.flaticon.com/512/2202/2202112.png" alt="Admin" />
+        </div>
+      </header>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+      <!-- Dashboard -->
+      <section id="dashboard" class="page active">
+        <div class="cards">
+          <div class="card" id="totalVehicles">Xe: ...</div>
+          <div class="card" id="totalCustomers">Khách hàng: ...</div>
+          <div class="card" id="totalOrders">Đơn hàng: ...</div>
+          <div class="card" id="totalFeedbacks">Phản hồi: ...</div>
+          <div class="card" id="totalTestDrives">Lái thử: ...</div>
+        </div>
+        <canvas id="salesChart" height="120"></canvas>
+      </section>
+
+      <!-- Xe -->
+      <section id="vehicles" class="page">
+        <h2>Danh sách xe điện</h2>
+        <div id="vehicle-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Khách hàng -->
+      <section id="customers" class="page">
+        <h2>Danh sách khách hàng</h2>
+        <div id="customer-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Đơn hàng -->
+      <section id="orders" class="page">
+        <h2>Danh sách đơn hàng</h2>
+
+        <!-- Form Thêm / Sửa Đơn hàng -->
+        <div class="form" id="order-form">
+          <input type="hidden" id="order-id" />
+          <select id="order-customer">
+            <option value="">Chọn khách hàng</option>
+          </select>
+          <select id="order-vehicle">
+            <option value="">Chọn xe</option>
+          </select>
+          <select id="order-status">
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <select id="order-payment">
+            <option value="Cash">Cash</option>
+            <option value="Installment">Installment</option>
+          </select>
+          <input type="number" id="order-amount" placeholder="Tổng tiền" />
+          <button type="button" onclick="saveOrder()">Lưu</button>
+          <button type="button" onclick="resetOrderForm()">Hủy</button>
+        </div>
+
+        <div id="order-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Phản hồi -->
+      <section id="feedbacks" class="page">
+        <h2>Phản hồi khách hàng</h2>
+        <div id="feedback-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Lái thử -->
+      <section id="testdrives" class="page">
+        <h2>Lịch lái thử</h2>
+
+        <!-- Form Thêm / Sửa -->
+        <div class="form" id="testdrive-form">
+          <input type="hidden" id="td-id" />
+          <select id="td-customer">
+            <option value="">Chọn khách hàng</option>
+          </select>
+          <select id="td-vehicle">
+            <option value="">Chọn xe</option>
+          </select>
+          <input type="date" id="td-date" />
+          <input type="time" id="td-time" />
+          <select id="td-status">
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <input type="text" id="td-note" placeholder="Ghi chú" />
+          <button type="button" onclick="saveTestDrive()">Lưu</button>
+          <button type="button" onclick="resetForm()">Hủy</button>
+        </div>
+
+        <div id="testdrive-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
 </html>

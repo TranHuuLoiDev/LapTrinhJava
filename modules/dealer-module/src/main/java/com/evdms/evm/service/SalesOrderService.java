@@ -23,15 +23,18 @@ public class SalesOrderService {
         return salesOrderRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public SalesOrder getSalesOrderById(Long id) {
         Optional<SalesOrder> order = salesOrderRepository.findById(id);
         return order.orElse(null);
     }
 
+    @SuppressWarnings("null")
     public SalesOrder saveSalesOrder(SalesOrder salesOrder) {
         return salesOrderRepository.save(salesOrder);
     }
 
+    @SuppressWarnings("null")
     public SalesOrder updateSalesOrder(Long id, SalesOrder updatedOrder) {
         return salesOrderRepository.findById(id)
             .map(order -> {
@@ -49,6 +52,7 @@ public class SalesOrderService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SalesOrder not found with id " + id));
     }
 
+    @SuppressWarnings("null")
     public void deleteSalesOrder(Long id) {
         if (!salesOrderRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SalesOrder not found with id " + id);
