@@ -27,25 +27,21 @@ public class OrderItemController {
         this.orderItemService = orderItemService;
     }
 
-    // --- GET tất cả order items ---
     @GetMapping
     public List<OrderItem> getAllOrderItems() {
         return orderItemService.getAllOrderItems();
     }
 
-    // --- GET theo ID ---
     @GetMapping("/{id}")
     public OrderItem getOrderItemById(@PathVariable("id") Long id) {
         return orderItemService.getOrderItemById(id);
     }
 
-    // --- POST thêm mới ---
     @PostMapping
     public OrderItem addOrderItem(@RequestBody OrderItem orderItem) {
         return orderItemService.saveOrderItem(orderItem);
     }
 
-    // --- DELETE theo ID ---
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteOrderItem(@PathVariable("id") Long id) {
         try {
@@ -56,7 +52,6 @@ public class OrderItemController {
         }
     }
 
-    // --- PUT cập nhật ---
     @PutMapping("/{id}")
     public ResponseEntity<OrderItem> updateOrderItem(
             @PathVariable("id") Long id,

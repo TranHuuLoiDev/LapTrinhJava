@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVM STAFF - EVDMS</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">EVDMS</div>
+            <nav class="menu" id="menuNav">
+                <!-- Menu will be populated by JavaScript -->
+            </nav>
+            <div class="user-info">
+                <div class="user-avatar"></div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-role" id="userRole">EVM_STAFF</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="pageTitle">EVM Dashboard</h1>
+                <div class="header-actions">
+                    <span id="userGreeting">Xin chào!</span>
+                </div>
+            </header>
+
+            <!-- EVM Dashboard Section -->
+            <section id="evmdashboard" class="content-section active">
+                <h2>Dashboard Nhà máy EVM</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Tổng số xe</h3>
+                            <p class="stat-number" id="totalVehicles">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Đại lý</h3>
+                            <p class="stat-number" id="totalDealers">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Tồn kho</h3>
+                            <p class="stat-number" id="totalInventory">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Đơn hàng</h3>
+                            <p class="stat-number" id="totalOrders">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Khuyến mãi</h3>
+                            <p class="stat-number" id="totalPromotions">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Thanh toán</h3>
+                            <p class="stat-number" id="totalPayments">...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid" style="margin-top: 30px;">
+                    <div class="chart-card">
+                        <h3>Phân bổ kho theo đại lý</h3>
+                        <canvas id="inventoryChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Doanh số theo khu vực</h3>
+                        <canvas id="regionalSalesChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vehicles Management Section -->
+            <section id="vehicles" class="content-section">
+                <h2>Quản lý Xe</h2>
+                <button class="btn btn-add" onclick="showVehicleForm()">+ Thêm xe mới</button>
+                
+                <div id="vehicleForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên xe</th>
+                                <th>Phiên bản</th>
+                                <th>Màu</th>
+                                <th>Giá gốc</th>
+                                <th>Giá bán</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehiclesList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Vehicle Specifications Section -->
+            <section id="vehiclespecs" class="content-section">
+                <h2>Thông số Kỹ thuật Xe</h2>
+                <button class="btn btn-add" onclick="showVehicleSpecForm()">+ Thêm thông số</button>
+                
+                <div id="vehicleSpecForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Xe</th>
+                                <th>Pin (kWh)</th>
+                                <th>Tầm (km)</th>
+                                <th>Công suất (kW)</th>
+                                <th>Tốc độ (km/h)</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicleSpecsList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Dealers Section -->
+            <section id="dealers" class="content-section">
+                <h2>Quản lý Đại lý</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên đại lý</th>
+                                <th>Địa chỉ</th>
+                                <th>Số điện thoại</th>
+                                <th>Hạng</th>
+                                <th>Hạn mức</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dealersList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Inventory Section -->
+            <section id="inventory" class="content-section">
+                <h2>Quản lý Kho</h2>
+                <button class="btn btn-add" onclick="showInventoryForm()">+ Phân bổ kho</button>
+                
+                <div id="inventoryForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Xe</th>
+                                <th>Đại lý</th>
+                                <th>Số lượng</th>
+                                <th>Đã đặt</th>
+                                <th>Có sẵn</th>
+                                <th>Vị trí</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Inventory Transactions Section -->
+            <section id="inventorytransactions" class="content-section">
+                <h2>Lịch sử Giao dịch Kho</h2>
+                <div class="filter-bar">
+                    <select id="transactionTypeFilter">
+                        <option value="">Tất cả loại</option>
+                        <option value="IN">Nhập kho</option>
+                        <option value="OUT">Xuất kho</option>
+                        <option value="TRANSFER">Điều chuyển</option>
+                        <option value="RETURN">Trả hàng</option>
+                        <option value="ADJUSTMENT">Điều chỉnh</option>
+                    </select>
+                    <input type="date" id="transactionDateFrom" placeholder="Từ ngày">
+                    <input type="date" id="transactionDateTo" placeholder="Đến ngày">
+                    <button class="btn btn-primary" onclick="filterTransactions()">Lọc</button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Xe</th>
+                                <th>Loại</th>
+                                <th>Số lượng</th>
+                                <th>Từ</th>
+                                <th>Đến</th>
+                                <th>Ngày</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Promotions Section -->
+            <section id="promotions" class="content-section">
+                <h2>Quản lý Khuyến mãi</h2>
+                <button class="btn btn-add" onclick="showPromotionForm()">+ Tạo khuyến mãi</button>
+                
+                <div id="promotionForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên chương trình</th>
+                                <th>Xe áp dụng</th>
+                                <th>Giảm giá (%)</th>
+                                <th>Từ ngày</th>
+                                <th>Đến ngày</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="promotionsList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Wholesale Prices Section -->
+            <section id="wholesaleprices" class="content-section">
+                <h2>Quản lý Giá sỉ</h2>
+                <button class="btn btn-add" onclick="showWholesalePriceForm()">+ Thiết lập giá sỉ</button>
+                
+                <div id="wholesalePriceForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Xe</th>
+                                <th>Đại lý</th>
+                                <th>Giá sỉ</th>
+                                <th>Từ ngày</th>
+                                <th>Đến ngày</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wholesalePricesList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Dealer Payments Section -->
+            <section id="dealerpayments" class="content-section">
+                <h2>Thanh toán từ Đại lý</h2>
+                <button class="btn btn-add" onclick="showPaymentForm()">+ Ghi nhận thanh toán</button>
+                
+                <div id="paymentForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Đại lý</th>
+                                <th>Ngày TT</th>
+                                <th>Số tiền</th>
+                                <th>Phương thức</th>
+                                <th>Mã tham chiếu</th>
+                                <th>Ngân hàng</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Orders View Section -->
+            <section id="orders" class="content-section">
+                <h2>Xem Đơn hàng (Tất cả đại lý)</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Đại lý</th>
+                                <th>Khách hàng</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { checkAuth, getCurrentUser, getUserRole, clearAuth } from '../assets/js/auth.js';
+        import { loadVehicles } from '../assets/js/vehicles.js';
+        import { loadOrders } from '../assets/js/Salesorders.js';
+        import { loadVehicleSpecs } from '../assets/js/vehiclespecs.js';
+        import { loadInventoryTransactions } from '../assets/js/inventorytransactions.js';
+        import { loadDealerPayments } from '../assets/js/dealerpayments.js';
+
+        // Check authentication
+        if (!checkAuth()) {
+            window.location.href = '../login.html';
+        }
+
+        // Verify role
+        const role = getUserRole();
+        if (role !== 'EVM_STAFF') {
+            alert('Bạn không có quyền truy cập trang này!');
+            window.location.href = '../login.html';
+        }
+
+        // Initialize menu
+        const menu = [
+            { id: 'evmdashboard', label: 'EVM Dashboard', icon: '' },
+            { id: 'vehicles', label: 'Quản lý Xe', icon: '' },
+            { id: 'vehiclespecs', label: 'Thông số KT', icon: '' },
+            { id: 'dealers', label: 'Đại lý', icon: '' },
+            { id: 'inventory', label: 'Quản lý Kho', icon: '' },
+            { id: 'inventorytransactions', label: 'Lịch sử Kho', icon: '' },
+            { id: 'orders', label: 'Đơn hàng', icon: '' },
+            { id: 'promotions', label: 'Khuyến mãi', icon: '' },
+            { id: 'wholesaleprices', label: 'Giá sỉ', icon: '' },
+            { id: 'dealerpayments', label: 'Thanh toán ĐL', icon: '' }
+        ];
+
+        const menuNav = document.getElementById('menuNav');
+        menu.forEach(item => {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.className = 'menu-item';
+            link.innerHTML = `<span class="menu-icon">${item.icon}</span><span class="menu-label">${item.label}</span>`;
+            link.onclick = (e) => {
+                e.preventDefault();
+                showPage(item.id);
+            };
+            menuNav.appendChild(link);
+        });
+
+        // Show page function
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('pageTitle').textContent = menu.find(m => m.id === pageId)?.label || 'EVM Dashboard';
+        };
+
+        // User info
+        const user = getCurrentUser();
+        document.getElementById('userName').textContent = user?.fullName || user?.username || 'EVM Staff';
+        document.getElementById('userGreeting').textContent = `Xin chào, ${user?.fullName || user?.username}!`;
+
+        // Logout function
+        window.logout = function() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                clearAuth();
+                window.location.href = '../login.html';
+            }
+        };
+
+        // Expose form functions
+        window.showVehicleForm = () => console.log('Show vehicle form');
+        window.showVehicleSpecForm = () => console.log('Show spec form');
+        window.showInventoryForm = () => console.log('Show inventory form');
+        window.showPromotionForm = () => console.log('Show promotion form');
+        window.showWholesalePriceForm = () => console.log('Show price form');
+        window.showPaymentForm = () => console.log('Show payment form');
+        window.filterTransactions = () => console.log('Filter transactions');
+
+        // Load initial data
+        async function init() {
+            await Promise.all([
+                loadVehicles(),
+                loadOrders(),
+                loadVehicleSpecs(),
+                loadInventoryTransactions(),
+                loadDealerPayments()
+            ]);
+            updateDashboardStats();
+            initCharts();
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('totalVehicles').textContent = document.querySelectorAll('#vehiclesList tr').length;
+            document.getElementById('totalDealers').textContent = '0'; // Load from API
+            document.getElementById('totalInventory').textContent = '0'; // Load from API
+            document.getElementById('totalOrders').textContent = document.querySelectorAll('#ordersList tr').length;
+            document.getElementById('totalPromotions').textContent = '0'; // Load from API
+            document.getElementById('totalPayments').textContent = document.querySelectorAll('#paymentsList tr').length;
+        }
+
+        function initCharts() {
+            // Inventory Distribution Chart
+            const invCtx = document.getElementById('inventoryChart');
+            if (invCtx) {
+                new Chart(invCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Đại lý 1', 'Đại lý 2', 'Đại lý 3', 'Đại lý 4', 'Kho HQ'],
+                        datasets: [{
+                            label: 'Số lượng xe',
+                            data: [65, 59, 80, 81, 150],
+                            backgroundColor: '#667eea'
+                        }]
+                    }
+                });
+            }
+
+            // Regional Sales Chart
+            const salesCtx = document.getElementById('regionalSalesChart');
+            if (salesCtx) {
+                new Chart(salesCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Miền Bắc', 'Miền Trung', 'Miền Nam'],
+                        datasets: [{
+                            data: [300, 150, 250],
+                            backgroundColor: ['#667eea', '#764ba2', '#f093fb']
+                        }]
+                    }
+                });
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

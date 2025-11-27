@@ -33,7 +33,6 @@ public class Customer {
     @Column(name = "date_created")
     private LocalDateTime dateCreated = LocalDateTime.now();
 
-    // --- Constructors ---
     public Customer() {}
 
     public Customer(String fullName, String phone, String email, String address) {
@@ -44,7 +43,6 @@ public class Customer {
         this.dateCreated = LocalDateTime.now();
     }
 
-    // --- Getters & Setters ---
     public Long getCustomerId() { return customerId; }
     public void setCustomerId(Long customerId) { this.customerId = customerId; }
 

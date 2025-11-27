@@ -27,25 +27,21 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
-    // --- GET tất cả inventories ---
     @GetMapping
     public List<Inventory> getAllInventories() {
         return inventoryService.getAllInventories();
     }
 
-    // --- GET inventory theo ID ---
     @GetMapping("/{id}")
     public Inventory getInventoryById(@PathVariable("id") Long id) {
         return inventoryService.getInventoryById(id);
     }
 
-    // --- POST: thêm inventory mới ---
     @PostMapping
     public Inventory addInventory(@RequestBody Inventory inventory) {
         return inventoryService.saveInventory(inventory);
     }
 
-    // --- PUT: cập nhật inventory ---
     @PutMapping("/{id}")
     public ResponseEntity<Inventory> updateInventory(
             @PathVariable("id") Long id,
@@ -58,7 +54,6 @@ public class InventoryController {
         }
     }
 
-    // --- DELETE inventory ---
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteInventory(@PathVariable("id") Long id) {
         try {

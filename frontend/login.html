@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - EVDMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .login-form {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .toggle-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .toggle-btn:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+
+        .alert-success {
+            background-color: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .demo-accounts {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .demo-accounts h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .demo-account {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .demo-account:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .demo-account .role {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .demo-account .credentials {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 13px;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 0;
+            }
+
+            .login-header h1 {
+                font-size: 28px;
+            }
+
+            .login-form {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>EVDMS</h1>
+            <p>Electric Vehicle Dealer Management System</p>
+        </div>
+
+        <form id="loginForm" class="login-form">
+            <div id="alert" class="alert"></div>
+
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Nhập tên đăng nhập"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Nhập mật khẩu"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button type="button" class="toggle-btn" onclick="togglePassword()">Hiện</button>
+                </div>
+            </div>
+
+            <button type="submit" id="loginBtn" class="login-btn">Đăng nhập</button>
+
+            <div class="demo-accounts">
+                <h3> Tài khoản demo</h3>
+                
+                <div class="demo-account" onclick="fillDemoAccount('dealer_staff', 'password123')">
+                    <div class="role"> Nhân viên Đại lý</div>
+                    <div class="credentials">dealer_staff / password123</div>
+                </div>
+
+                <div class="demo-account" onclick="fillDemoAccount('dealer_manager', 'password123')">
+                    <div class="role"> Quản lý Đại lý</div>
+                    <div class="credentials">dealer_manager / password123</div>
+                </div>
+
+                <div class="demo-account" onclick="fillDemoAccount('evm_staff', 'password123')">
+                    <div class="role"> Nhân viên EVM</div>
+                    <div class="credentials">evm_staff / password123</div>
+                </div>
+
+                <div class="demo-account" onclick="fillDemoAccount('admin', 'admin123')">
+                    <div class="role"> Quản trị viên</div>
+                    <div class="credentials">admin / admin123</div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="footer">
+        &copy; 2025 EVDMS. All rights reserved.
+    </div>
+
+    <script type="module">
+        // Auth API endpoint
+        const AUTH_API = 'http://localhost:8080/api/session';
+
+        // Toggle password visibility
+        window.togglePassword = function() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = 'Ẩn';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = 'Hiện';
+            }
+        };
+
+        // Fill demo account credentials
+        window.fillDemoAccount = function(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            document.getElementById('username').focus();
+        };
+
+        // Show alert message
+        function showAlert(message, type = 'error') {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showAlert('Vui lòng nhập tên đăng nhập và mật khẩu');
+                return;
+            }
+
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading"></span>Đang đăng nhập...';
+
+            try {
+                const response = await fetch(`${AUTH_API}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Normalize role: Convert database format to frontend format
+                    // Database: 'Admin', 'EVM Staff', 'Dealer Manager', 'Dealer Staff'
+                    // Frontend: 'ADMIN', 'EVM_STAFF', 'DEALER_MANAGER', 'DEALER_STAFF'
+                    const normalizedRole = data.user.role
+                        .toUpperCase()
+                        .replace(/\s+/g, '_'); // Replace spaces with underscores
+                    
+                    // Update user object with normalized role (replace original role)
+                    data.user.role = normalizedRole;
+                    
+                    // Save user info to localStorage
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('isLoggedIn', 'true');
+                    if (data.token) {
+                        localStorage.setItem('token', data.token);
+                    }
+
+                    showAlert('Đăng nhập thành công! Đang chuyển hướng...', 'success');
+
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = 'pages/dashboard.html';
+                    }, 1000);
+                } else {
+                    showAlert(data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Đăng nhập';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Lỗi kết nối. Vui lòng thử lại sau.');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Đăng nhập';
+            }
+        });
+
+        // Check if already logged in
+        async function checkExistingSession() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const user = localStorage.getItem('user');
+            
+            if (isLoggedIn === 'true' && user) {
+                try {
+                    const response = await fetch(`${AUTH_API}/check`, {
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.user) {
+                            window.location.href = 'assets/index.html';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Session check error:', error);
+                }
+            }
+        }
+
+        // Check on page load
+        checkExistingSession();
+    </script>
+</body>
+</html>

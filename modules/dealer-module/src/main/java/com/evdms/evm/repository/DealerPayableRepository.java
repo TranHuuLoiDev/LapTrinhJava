@@ -7,5 +7,6 @@ import com.evdms.evm.model.DealerPayable;
 
 @Repository
 public interface DealerPayableRepository extends JpaRepository<DealerPayable, Long> {
-    // JpaRepository cung cấp sẵn findAll(), findById(), save(), delete()...
+
+    java.util.List<DealerPayable> findByDealerId(Long dealerId);
 }

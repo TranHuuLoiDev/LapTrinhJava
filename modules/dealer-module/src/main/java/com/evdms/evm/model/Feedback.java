@@ -39,7 +39,6 @@ public class Feedback {
     @Column(nullable = false)
     private String status;
 
-    // --- Constructors ---
     public Feedback() {}
 
     public Feedback(Long customerId, String feedbackType, String subject, String content,
@@ -53,7 +52,6 @@ public class Feedback {
         this.status = status;
     }
 
-    // --- Getters & Setters ---
     public Long getFeedbackId() { return feedbackId; }
     public void setFeedbackId(Long feedbackId) { this.feedbackId = feedbackId; }
 

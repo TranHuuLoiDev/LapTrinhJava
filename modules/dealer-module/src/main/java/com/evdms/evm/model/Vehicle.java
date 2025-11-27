@@ -36,28 +36,19 @@ public class Vehicle {
     @Column(length = 1000)
     private String description;
 
-    @Column(nullable = false)
-    private String model;
-
-    private Double price;
-
-    // --- Constructors ---
     public Vehicle() {}
 
     public Vehicle(String modelName, String version, String color,
                    BigDecimal basePrice, BigDecimal retailPrice,
-                   String description, String model, Double price) {
+                   String description) {
         this.modelName = modelName;
         this.version = version;
         this.color = color;
         this.basePrice = basePrice;
         this.retailPrice = retailPrice;
         this.description = description;
-        this.model = model;
-        this.price = price;
     }
 
-    // --- Getters & Setters ---
     public Long getVehicleId() { return vehicleId; }
     public void setVehicleId(Long vehicleId) { this.vehicleId = vehicleId; }
 
@@ -78,10 +69,4 @@ public class Vehicle {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-
-    public String getModel() { return model; }
-    public void setModel(String model) { this.model = model; }
-
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
 }

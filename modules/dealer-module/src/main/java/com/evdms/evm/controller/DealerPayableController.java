@@ -27,25 +27,21 @@ public class DealerPayableController {
         this.dealerPayableService = dealerPayableService;
     }
 
-    // --- GET tất cả dealer payables ---
     @GetMapping
     public List<DealerPayable> getAllDealerPayables() {
         return dealerPayableService.getAllDealerPayables();
     }
 
-    // --- GET theo ID ---
     @GetMapping("/{id}")
     public DealerPayable getDealerPayableById(@PathVariable("id") Long id) {
         return dealerPayableService.getDealerPayableById(id);
     }
 
-    // --- POST: thêm mới ---
     @PostMapping
     public DealerPayable addDealerPayable(@RequestBody DealerPayable dealerPayable) {
         return dealerPayableService.saveDealerPayable(dealerPayable);
     }
 
-    // --- PUT: cập nhật ---
     @PutMapping("/{id}")
     public ResponseEntity<DealerPayable> updateDealerPayable(
             @PathVariable("id") Long id,
@@ -58,7 +54,6 @@ public class DealerPayableController {
         }
     }
 
-    // --- DELETE ---
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDealerPayable(@PathVariable("id") Long id) {
         try {

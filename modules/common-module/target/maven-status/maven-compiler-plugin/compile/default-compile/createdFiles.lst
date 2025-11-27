@@ -1,0 +1,6 @@
+com\evdms\common\dto\AuthRequest.class
+com\evdms\common\dto\AuthResponse$AuthResponseBuilder.class
+com\evdms\common\dto\AuthResponse.class
+com\evdms\common\enums\UserRole.class
+com\evdms\common\security\JwtTokenProvider.class
+com\evdms\common\security\JwtAuthenticationFilter.class

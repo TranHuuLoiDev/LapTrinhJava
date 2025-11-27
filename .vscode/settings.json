@@ -8,5 +8,7 @@
   ],
   "java.configuration.defaultRuntime": "JavaSE-17",
   "java.configuration.updateBuildConfiguration": "automatic",
-  "java.compile.nullAnalysis.mode": "automatic"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "chat.agent.maxRequests": 50000,
+  "java.debug.settings.onBuildFailureProceed": true
 }

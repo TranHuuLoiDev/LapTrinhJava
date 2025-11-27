@@ -27,25 +27,21 @@ public class TestDriveController {
         this.testDriveService = testDriveService;
     }
 
-    // --- GET tất cả test drives ---
     @GetMapping
     public List<TestDrive> getAllTestDrives() {
         return testDriveService.getAllTestDrives();
     }
 
-    // --- GET test drive theo ID ---
     @GetMapping("/{id}")
     public TestDrive getTestDriveById(@PathVariable("id") Long id) {
         return testDriveService.getTestDriveById(id);
     }
 
-    // --- POST: thêm test drive ---
     @PostMapping
     public TestDrive addTestDrive(@RequestBody TestDrive testDrive) {
         return testDriveService.saveTestDrive(testDrive);
     }
 
-    // --- DELETE test drive ---
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTestDrive(@PathVariable("id") Long id) {
         try {
@@ -56,7 +52,6 @@ public class TestDriveController {
         }
     }
 
-    // --- PUT: cập nhật test drive ---
     @PutMapping("/{id}")
     public ResponseEntity<TestDrive> updateTestDrive(
             @PathVariable("id") Long id,

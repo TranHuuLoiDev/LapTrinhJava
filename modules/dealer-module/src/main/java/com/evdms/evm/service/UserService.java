@@ -18,25 +18,21 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // GET all
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // GET by ID
     @SuppressWarnings("null")
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    // POST
     @SuppressWarnings("null")
     public User saveUser(User user) {
         return userRepository.save(user);
     }
 
-    // PUT
     public User updateUser(Long id, User updatedUser) {
         User existing = getUserById(id);
         existing.setUsername(updatedUser.getUsername());
@@ -48,7 +44,6 @@ public class UserService {
         return userRepository.save(existing);
     }
 
-    // DELETE
     @SuppressWarnings("null")
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {

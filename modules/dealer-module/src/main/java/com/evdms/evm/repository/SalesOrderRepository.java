@@ -7,5 +7,6 @@ import com.evdms.evm.model.SalesOrder;
 
 @Repository
 public interface SalesOrderRepository extends JpaRepository<SalesOrder, Long> {
-    // JpaRepository đã có sẵn các hàm CRUD cơ bản
+
+    java.util.List<SalesOrder> findByDealerId(Long dealerId);
 }

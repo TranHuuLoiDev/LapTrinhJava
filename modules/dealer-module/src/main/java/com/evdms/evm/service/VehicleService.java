@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.evdms.evm.model.Vehicle;
 import com.evdms.evm.repository.VehicleRepository;
 
-
 @Service
 public class VehicleService {
 
@@ -27,7 +26,7 @@ public class VehicleService {
     @SuppressWarnings("null")
     public Vehicle getVehicleById(Long id) {
         Optional<Vehicle> vehicle = vehicleRepository.findById(id);
-        return vehicle.orElse(null); // hoặc ném exception nếu muốn
+        return vehicle.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found with id " + id));
     }
 
     @SuppressWarnings("null")
@@ -37,19 +36,17 @@ public class VehicleService {
 
     @SuppressWarnings("null")
     public Vehicle updateVehicle(Long id, Vehicle updatedVehicle) {
-    return vehicleRepository.findById(id)
-        .map(vehicle -> {
-            vehicle.setModelName(updatedVehicle.getModelName());
-            vehicle.setColor(updatedVehicle.getColor());
-            vehicle.setPrice(updatedVehicle.getPrice());
-            vehicle.setBasePrice(updatedVehicle.getBasePrice());
-            vehicle.setRetailPrice(updatedVehicle.getRetailPrice());
-            vehicle.setDescription(updatedVehicle.getDescription());
-            vehicle.setModel(updatedVehicle.getModel());
-            return vehicleRepository.save(vehicle);
-        })
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found with id " + id));
-
+        return vehicleRepository.findById(id)
+            .map(vehicle -> {
+                vehicle.setModelName(updatedVehicle.getModelName());
+                vehicle.setVersion(updatedVehicle.getVersion());
+                vehicle.setColor(updatedVehicle.getColor());
+                vehicle.setBasePrice(updatedVehicle.getBasePrice());
+                vehicle.setRetailPrice(updatedVehicle.getRetailPrice());
+                vehicle.setDescription(updatedVehicle.getDescription());
+                return vehicleRepository.save(vehicle);
+            })
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found with id " + id));
     }
 
     @SuppressWarnings("null")
@@ -59,7 +56,5 @@ public class VehicleService {
     }
     vehicleRepository.deleteById(id);
     }
-
-
 
 }

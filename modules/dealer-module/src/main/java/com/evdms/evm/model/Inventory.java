@@ -31,7 +31,6 @@ public class Inventory {
     @Column
     private String location;
 
-    // --- Constructors ---
     public Inventory() {}
 
     public Inventory(Long vehicleId, Long dealerId, Integer quantity, String vinNumber, String location) {
@@ -42,7 +41,6 @@ public class Inventory {
         this.location = location;
     }
 
-    // --- Getters & Setters ---
     public Long getInventoryId() { return inventoryId; }
     public void setInventoryId(Long inventoryId) { this.inventoryId = inventoryId; }
 

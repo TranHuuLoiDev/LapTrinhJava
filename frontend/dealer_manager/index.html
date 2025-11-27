@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEALER MANAGER - EVDMS</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">EVDMS</div>
+            <nav class="menu" id="menuNav">
+                <!-- Menu will be populated by JavaScript -->
+            </nav>
+            <div class="user-info">
+                <div class="user-avatar"></div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-role" id="userRole">DEALER_MANAGER</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="pageTitle">Dashboard Quản lý</h1>
+                <div class="header-actions">
+                    <span id="userGreeting">Xin chào!</span>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <h2>Dashboard Quản lý Đại lý</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Xe có sẵn</h3>
+                            <p class="stat-number" id="totalVehicles">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Khách hàng</h3>
+                            <p class="stat-number" id="totalCustomers">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Đơn hàng</h3>
+                            <p class="stat-number" id="totalOrders">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Phản hồi</h3>
+                            <p class="stat-number" id="totalFeedbacks">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Lái thử</h3>
+                            <p class="stat-number" id="totalTestDrives">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Tài chính</h3>
+                            <p class="stat-number" id="totalFinancing">...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid" style="margin-top: 30px;">
+                    <div class="chart-card">
+                        <h3>Doanh số theo tháng</h3>
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Trạng thái đơn hàng</h3>
+                        <canvas id="orderStatusChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vehicles Section (Read Only) -->
+            <section id="vehicles" class="content-section">
+                <h2>Danh sách Xe</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên xe</th>
+                                <th>Phiên bản</th>
+                                <th>Màu</th>
+                                <th>Giá bán</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehiclesList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Customers Section -->
+            <section id="customers" class="content-section">
+                <h2>Quản lý Khách hàng</h2>
+                <button class="btn btn-add" onclick="showCustomerForm()">+ Thêm khách hàng</button>
+                
+                <div id="customerForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th>Địa chỉ</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="orders" class="content-section">
+                <h2>Quản lý Đơn hàng</h2>
+                <button class="btn btn-add" onclick="showOrderForm()">+ Tạo đơn hàng</button>
+                
+                <div id="orderForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Financing Section -->
+            <section id="financing" class="content-section">
+                <h2>Quản lý Tài chính Khách hàng</h2>
+                <button class="btn btn-add" onclick="showFinancingForm()">+ Tạo hồ sơ tài chính</button>
+                
+                <div id="financingForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Ngân hàng</th>
+                                <th>Số tiền vay</th>
+                                <th>Trả góp/tháng</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financingList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Test Drives Section -->
+            <section id="testdrives" class="content-section">
+                <h2>Quản lý Lái thử</h2>
+                <button class="btn btn-add" onclick="showTestDriveForm()">+ Đăng ký lái thử</button>
+                
+                <div id="testDriveForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Xe</th>
+                                <th>Ngày lái thử</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="testDrivesList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Feedbacks Section -->
+            <section id="feedbacks" class="content-section">
+                <h2>Phản hồi Khách hàng</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Xe</th>
+                                <th>Rating</th>
+                                <th>Nội dung</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedbacksList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Interactions Section -->
+            <section id="interactions" class="content-section">
+                <h2>Tương tác Khách hàng (CRM)</h2>
+                <button class="btn btn-add" onclick="showInteractionForm()">+ Ghi nhận tương tác</button>
+                
+                <div id="interactionForm" class="form-container" style="display: none;"></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Loại</th>
+                                <th>Chủ đề</th>
+                                <th>Ngày</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interactionsList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <h2>Báo cáo & Thống kê</h2>
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <h3> Báo cáo doanh số</h3>
+                        <p>Doanh số theo tháng, quý, năm</p>
+                        <button class="btn btn-primary">Xem báo cáo</button>
+                    </div>
+                    <div class="report-card">
+                        <h3> Phân tích khách hàng</h3>
+                        <p>Phân khúc và hành vi khách hàng</p>
+                        <button class="btn btn-primary">Xem báo cáo</button>
+                    </div>
+                    <div class="report-card">
+                        <h3> Hiệu suất sản phẩm</h3>
+                        <p>Xe bán chạy, tồn kho</p>
+                        <button class="btn btn-primary">Xem báo cáo</button>
+                    </div>
+                    <div class="report-card">
+                        <h3> Tài chính</h3>
+                        <p>Doanh thu, lợi nhuận, nợ</p>
+                        <button class="btn btn-primary">Xem báo cáo</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { checkAuth, getCurrentUser, getUserRole, clearAuth } from '../assets/js/auth.js';
+        import { loadVehicles } from '../assets/js/vehicles.js';
+        import { loadCustomers } from '../assets/js/customers.js';
+        import { loadOrders } from '../assets/js/Salesorders.js';
+        import { loadTestDrives } from '../assets/js/testdrives.js';
+        import { loadFeedbacks } from '../assets/js/feedbacks.js';
+        import { loadFinancing } from '../assets/js/financing.js';
+        import { loadInteractions } from '../assets/js/interactions.js';
+
+        // Check authentication
+        if (!checkAuth()) {
+            window.location.href = '../login.html';
+        }
+
+        // Verify role
+        const role = getUserRole();
+        if (role !== 'DEALER_MANAGER') {
+            alert('Bạn không có quyền truy cập trang này!');
+            window.location.href = '../login.html';
+        }
+
+        // Initialize menu
+        const menu = [
+            { id: 'dashboard', label: 'Dashboard', icon: '' },
+            { id: 'vehicles', label: 'Danh sách Xe', icon: '' },
+            { id: 'customers', label: 'Khách hàng', icon: '' },
+            { id: 'orders', label: 'Đơn hàng', icon: '' },
+            { id: 'financing', label: 'Tài chính KH', icon: '' },
+            { id: 'testdrives', label: 'Lái thử', icon: '' },
+            { id: 'feedbacks', label: 'Phản hồi', icon: '' },
+            { id: 'interactions', label: 'Tương tác KH', icon: '' },
+            { id: 'reports', label: 'Báo cáo', icon: '' }
+        ];
+
+        const menuNav = document.getElementById('menuNav');
+        menu.forEach(item => {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.className = 'menu-item';
+            link.innerHTML = `<span class="menu-icon">${item.icon}</span><span class="menu-label">${item.label}</span>`;
+            link.onclick = (e) => {
+                e.preventDefault();
+                showPage(item.id);
+            };
+            menuNav.appendChild(link);
+        });
+
+        // Show page function
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('pageTitle').textContent = menu.find(m => m.id === pageId)?.label || 'Dashboard';
+        };
+
+        // User info
+        const user = getCurrentUser();
+        document.getElementById('userName').textContent = user?.fullName || user?.username || 'Manager';
+        document.getElementById('userGreeting').textContent = `Xin chào, ${user?.fullName || user?.username}!`;
+
+        // Logout function
+        window.logout = function() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                clearAuth();
+                window.location.href = '../login.html';
+            }
+        };
+
+        // Expose form functions (will be implemented by imported modules)
+        window.showCustomerForm = () => console.log('Show customer form');
+        window.showOrderForm = () => console.log('Show order form');
+        window.showFinancingForm = () => console.log('Show financing form');
+        window.showTestDriveForm = () => console.log('Show test drive form');
+        window.showInteractionForm = () => console.log('Show interaction form');
+
+        // Load initial data
+        async function init() {
+            await Promise.all([
+                loadVehicles(),
+                loadCustomers(),
+                loadOrders(),
+                loadTestDrives(),
+                loadFeedbacks(),
+                loadFinancing(),
+                loadInteractions()
+            ]);
+            updateDashboardStats();
+            initCharts();
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('totalVehicles').textContent = document.querySelectorAll('#vehiclesList tr').length;
+            document.getElementById('totalCustomers').textContent = document.querySelectorAll('#customersList tr').length;
+            document.getElementById('totalOrders').textContent = document.querySelectorAll('#ordersList tr').length;
+            document.getElementById('totalFeedbacks').textContent = document.querySelectorAll('#feedbacksList tr').length;
+            document.getElementById('totalTestDrives').textContent = document.querySelectorAll('#testDrivesList tr').length;
+            document.getElementById('totalFinancing').textContent = document.querySelectorAll('#financingList tr').length;
+        }
+
+        function initCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart');
+            if (salesCtx) {
+                new Chart(salesCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
+                        datasets: [{
+                            label: 'Doanh số (triệu VNĐ)',
+                            data: [120, 190, 300, 500, 200, 300],
+                            borderColor: '#667eea',
+                            tension: 0.4
+                        }]
+                    }
+                });
+            }
+
+            // Order Status Chart
+            const orderCtx = document.getElementById('orderStatusChart');
+            if (orderCtx) {
+                new Chart(orderCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pending', 'Confirmed', 'Delivered', 'Cancelled'],
+                        datasets: [{
+                            data: [12, 19, 30, 5],
+                            backgroundColor: ['#ffc107', '#28a745', '#17a2b8', '#dc3545']
+                        }]
+                    }
+                });
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

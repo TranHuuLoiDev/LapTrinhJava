@@ -7,5 +7,6 @@ import com.evdms.evm.model.Inventory;
 
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
-    // JpaRepository đã cung cấp sẵn findAll(), findById(), save(), delete()...
+    java.util.List<Inventory> findByVehicleId(Long vehicleId);
+    java.util.List<Inventory> findByDealerId(Long dealerId);
 }

@@ -7,5 +7,5 @@ import com.evdms.evm.model.Customer;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
-    // JpaRepository có sẵn: findAll, findById, save, deleteById,...
+
 }

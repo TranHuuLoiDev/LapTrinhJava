@@ -7,5 +7,5 @@ import com.evdms.evm.model.TestDrive;
 
 @Repository
 public interface TestDriveRepository extends JpaRepository<TestDrive, Long> {
-    // JpaRepository có sẵn các hàm findAll(), findById(), save(), deleteById()
+
 }

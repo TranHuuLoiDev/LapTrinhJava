@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEALER STAFF - EVDMS</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">EVDMS</div>
+            <nav class="menu" id="menuNav">
+                <!-- Menu will be populated by JavaScript -->
+            </nav>
+            <div class="user-info">
+                <div class="user-avatar"></div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-role" id="userRole">DEALER_STAFF</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="pageTitle">Dashboard Nhân viên</h1>
+                <div class="header-actions">
+                    <span id="userGreeting">Xin chào!</span>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <h2>Dashboard Nhân viên Đại lý</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Xe có sẵn</h3>
+                            <p class="stat-number" id="totalVehicles">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Khách hàng của tôi</h3>
+                            <p class="stat-number" id="totalCustomers">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Lái thử hôm nay</h3>
+                            <p class="stat-number" id="totalTestDrives">...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"></div>
+                        <div class="stat-info">
+                            <h3>Tương tác gần đây</h3>
+                            <p class="stat-number" id="totalInteractions">...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vehicles Section (Read Only) -->
+            <section id="vehicles" class="content-section">
+                <h2>Danh sách Xe</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên xe</th>
+                                <th>Phiên bản</th>
+                                <th>Màu</th>
+                                <th>Giá</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehiclesList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Customers Section -->
+            <section id="customers" class="content-section">
+                <h2>Quản lý Khách hàng</h2>
+                <button class="btn btn-add" onclick="showCustomerForm()">+ Thêm khách hàng</button>
+                
+                <div id="customerForm" class="form-container" style="display: none;">
+                    <h3 id="customerFormTitle">Thêm khách hàng mới</h3>
+                    <form id="customerFormElement">
+                        <input type="hidden" id="customerId">
+                        <div class="form-group">
+                            <label>Họ tên:</label>
+                            <input type="text" id="customerFullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại:</label>
+                            <input type="tel" id="customerPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="customerEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ:</label>
+                            <textarea id="customerAddress"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetCustomerForm()">Hủy</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th>Địa chỉ</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Test Drives Section -->
+            <section id="testdrives" class="content-section">
+                <h2>Quản lý Lái thử</h2>
+                <button class="btn btn-add" onclick="showTestDriveForm()">+ Đăng ký lái thử</button>
+                
+                <div id="testDriveForm" class="form-container" style="display: none;">
+                    <h3>Đăng ký lái thử</h3>
+                    <form id="testDriveFormElement">
+                        <input type="hidden" id="testDriveId">
+                        <div class="form-group">
+                            <label>Khách hàng:</label>
+                            <select id="testDriveCustomer" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Xe:</label>
+                            <select id="testDriveVehicle" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày lái thử:</label>
+                            <input type="datetime-local" id="testDriveDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ghi chú:</label>
+                            <textarea id="testDriveNotes"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetTestDriveForm()">Hủy</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Xe</th>
+                                <th>Ngày lái thử</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="testDrivesList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Interactions Section -->
+            <section id="interactions" class="content-section">
+                <h2>Tương tác Khách hàng</h2>
+                <button class="btn btn-add" onclick="showInteractionForm()">+ Ghi nhận tương tác</button>
+                
+                <div id="interactionForm" class="form-container" style="display: none;">
+                    <h3>Ghi nhận tương tác</h3>
+                    <form id="interactionFormElement">
+                        <input type="hidden" id="interactionId">
+                        <div class="form-group">
+                            <label>Khách hàng:</label>
+                            <select id="interactionCustomer" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Loại:</label>
+                            <select id="interactionType" required>
+                                <option value="Call">Điện thoại</option>
+                                <option value="Email">Email</option>
+                                <option value="Meeting">Gặp mặt</option>
+                                <option value="SMS">SMS</option>
+                                <option value="Other">Khác</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Chủ đề:</label>
+                            <input type="text" id="interactionSubject" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ghi chú:</label>
+                            <textarea id="interactionNotes" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày tương tác:</label>
+                            <input type="datetime-local" id="interactionDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Follow-up:</label>
+                            <input type="datetime-local" id="interactionFollowUp">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetInteractionForm()">Hủy</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Loại</th>
+                                <th>Chủ đề</th>
+                                <th>Ngày</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interactionsList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { checkAuth, getCurrentUser, getUserRole, clearAuth } from '../assets/js/auth.js';
+        import { loadVehicles } from '../assets/js/vehicles.js';
+        import { loadCustomers, displayCustomers, editCustomer, saveCustomer, resetCustomerForm } from '../assets/js/customers.js';
+        import { loadTestDrives, displayTestDrives, editTestDrive, saveTestDrive, resetTestDriveForm } from '../assets/js/testdrives.js';
+        import { loadInteractions, displayInteractions, editInteraction, saveInteraction, resetInteractionForm } from '../assets/js/interactions.js';
+
+        // Check authentication
+        if (!checkAuth()) {
+            window.location.href = '../login.html';
+        }
+
+        // Verify role
+        const role = getUserRole();
+        if (role !== 'DEALER_STAFF') {
+            alert('Bạn không có quyền truy cập trang này!');
+            window.location.href = '../login.html';
+        }
+
+        // Initialize menu
+        const menu = [
+            { id: 'dashboard', label: 'Dashboard', icon: '' },
+            { id: 'vehicles', label: 'Danh sách Xe', icon: '' },
+            { id: 'customers', label: 'Khách hàng', icon: '' },
+            { id: 'testdrives', label: 'Lái thử', icon: '' },
+            { id: 'interactions', label: 'Tương tác KH', icon: '' }
+        ];
+
+        const menuNav = document.getElementById('menuNav');
+        menu.forEach(item => {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.className = 'menu-item';
+            link.innerHTML = `<span class="menu-icon">${item.icon}</span><span class="menu-label">${item.label}</span>`;
+            link.onclick = (e) => {
+                e.preventDefault();
+                showPage(item.id);
+            };
+            menuNav.appendChild(link);
+        });
+
+        // Show page function
+        function showPage(pageId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('pageTitle').textContent = menu.find(m => m.id === pageId)?.label || 'Dashboard';
+        }
+
+        // User info
+        const user = getCurrentUser();
+        document.getElementById('userName').textContent = user?.fullName || user?.username || 'User';
+        document.getElementById('userGreeting').textContent = `Xin chào, ${user?.fullName || user?.username}!`;
+
+        // Logout function
+        window.logout = function() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                clearAuth();
+                window.location.href = '../login.html';
+            }
+        };
+
+        // Expose functions to global scope
+        window.showCustomerForm = () => document.getElementById('customerForm').style.display = 'block';
+        window.resetCustomerForm = resetCustomerForm;
+        window.editCustomer = editCustomer;
+        window.saveCustomer = saveCustomer;
+        
+        window.showTestDriveForm = () => document.getElementById('testDriveForm').style.display = 'block';
+        window.resetTestDriveForm = resetTestDriveForm;
+        window.editTestDrive = editTestDrive;
+        window.saveTestDrive = saveTestDrive;
+        
+        window.showInteractionForm = () => document.getElementById('interactionForm').style.display = 'block';
+        window.resetInteractionForm = resetInteractionForm;
+        window.editInteraction = editInteraction;
+        window.saveInteraction = saveInteraction;
+
+        // Form submissions
+        document.getElementById('customerFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveCustomer();
+        });
+
+        document.getElementById('testDriveFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveTestDrive();
+        });
+
+        document.getElementById('interactionFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveInteraction();
+        });
+
+        // Load initial data
+        async function init() {
+            await loadVehicles();
+            await loadCustomers();
+            await loadTestDrives();
+            await loadInteractions();
+            updateDashboardStats();
+        }
+
+        function updateDashboardStats() {
+            // Update stats from loaded data
+            document.getElementById('totalVehicles').textContent = document.querySelectorAll('#vehiclesList tr').length;
+            document.getElementById('totalCustomers').textContent = document.querySelectorAll('#customersList tr').length;
+            document.getElementById('totalTestDrives').textContent = document.querySelectorAll('#testDrivesList tr').length;
+            document.getElementById('totalInteractions').textContent = document.querySelectorAll('#interactionsList tr').length;
+        }
+
+        init();
+    </script>
+</body>
+</html>

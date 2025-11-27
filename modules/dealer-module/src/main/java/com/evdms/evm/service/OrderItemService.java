@@ -7,15 +7,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.evdms.evm.model.OrderItem;
+import com.evdms.evm.model.SalesOrder;
 import com.evdms.evm.repository.OrderItemRepository;
+import com.evdms.evm.repository.SalesOrderRepository;
 
 @Service
 public class OrderItemService {
 
     private final OrderItemRepository orderItemRepository;
+    private final SalesOrderRepository salesOrderRepository;
 
-    public OrderItemService(OrderItemRepository orderItemRepository) {
+    public OrderItemService(OrderItemRepository orderItemRepository,
+                            SalesOrderRepository salesOrderRepository) {
         this.orderItemRepository = orderItemRepository;
+        this.salesOrderRepository = salesOrderRepository;
     }
 
     public List<OrderItem> getAllOrderItems() {
@@ -29,7 +34,15 @@ public class OrderItemService {
     }
 
     @SuppressWarnings("null")
+
     public OrderItem saveOrderItem(OrderItem orderItem) {
+        if (orderItem.getOrder() == null || orderItem.getOrder().getOrderId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order is required");
+        }
+                SalesOrder order = salesOrderRepository.findById(orderItem.getOrder().getOrderId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SalesOrder not found"));
+
+        orderItem.setOrder(order);
         return orderItemRepository.save(orderItem);
     }
 
@@ -44,7 +57,12 @@ public class OrderItemService {
     @SuppressWarnings("null")
     public OrderItem updateOrderItem(Long id, OrderItem updatedOrderItem) {
         return orderItemRepository.findById(id).map(orderItem -> {
-            orderItem.setOrderId(updatedOrderItem.getOrderId());
+
+            if (updatedOrderItem.getOrder() != null && updatedOrderItem.getOrder().getOrderId() != null) {
+                SalesOrder order = salesOrderRepository.findById(updatedOrderItem.getOrder().getOrderId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SalesOrder not found"));
+                orderItem.setOrder(order);
+            }
             orderItem.setVehicle(updatedOrderItem.getVehicle());
             orderItem.setQuantity(updatedOrderItem.getQuantity());
             orderItem.setUnitPrice(updatedOrderItem.getUnitPrice());

@@ -7,5 +7,5 @@ import com.evdms.evm.model.Feedback;
 
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
-    // JpaRepository đã cung cấp sẵn findAll(), findById(), save(), delete()...
+
 }

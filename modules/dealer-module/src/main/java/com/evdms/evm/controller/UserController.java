@@ -27,25 +27,21 @@ public class UserController {
         this.userService = userService;
     }
 
-    // GET all
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    // GET by ID
     @GetMapping("/{id}")
     public User getUserById(@PathVariable("id") Long id) {
         return userService.getUserById(id);
     }
 
-    // POST
     @PostMapping
     public User addUser(@RequestBody User user) {
         return userService.saveUser(user);
     }
 
-    // PUT
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(
             @PathVariable("id") Long id,
@@ -58,7 +54,6 @@ public class UserController {
         }
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
         try {

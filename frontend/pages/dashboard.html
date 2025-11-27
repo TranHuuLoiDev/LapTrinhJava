@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVDMS Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">EVDMS</div>
+            <nav id="menuNav">
+                <!-- Menu will be dynamically populated based on role -->
+            </nav>
+            <div class="user-info" style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5em;"></div>
+                    <div>
+                        <div id="userName" style="font-weight: 600; font-size: 0.95em;">Loading...</div>
+                        <div id="userRole" style="font-size: 0.8em; opacity: 0.8;">Role</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()" style="width: 100%;">Đăng xuất</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <header class="header">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="admin-info">
+                    <span id="userGreeting">Xin chào!</span>
+                </div>
+            </header>
+
+            <!-- Content Sections (Dynamic based on role) -->
+            <div id="contentContainer">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { checkAuth, getCurrentUser, getUserRole, clearAuth, getMenuItems } from '../js/auth.js';
+        import { ROLES } from '../js/config.js';
+
+        // Check authentication
+        if (!checkAuth()) {
+            console.log('Not authenticated, redirecting to login...');
+            window.location.href = '../index.html';
+            throw new Error('Not authenticated');
+        }
+
+        const user = getCurrentUser();
+        const role = getUserRole();
+        
+        console.log('Dashboard loaded for user:', user);
+        console.log('User role:', role);
+
+        // Display user info
+        document.getElementById('userName').textContent = user.fullName || user.username;
+        document.getElementById('userRole').textContent = role;
+        document.getElementById('userGreeting').textContent = `Xin chào, ${user.fullName || user.username}!`;
+
+        // Build menu based on role
+        const menuItems = getMenuItems();
+        const menuNav = document.getElementById('menuNav');
+        
+        menuItems.forEach((item, index) => {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'menu-item' + (index === 0 ? ' active' : '');
+            menuItem.innerHTML = `
+                <span class="menu-icon">${item.icon}</span>
+                <span class="menu-label">${item.label}</span>
+            `;
+            menuItem.onclick = () => showPage(item.id, menuItem);
+            menuNav.appendChild(menuItem);
+        });
+
+        // Show page function
+        let currentModule = null;
+        
+        async function showPage(pageId, menuElement) {
+            // Update active menu
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            menuElement.classList.add('active');
+
+            // Update page title
+            const menuItem = menuItems.find(m => m.id === pageId);
+            document.getElementById('pageTitle').textContent = menuItem?.label || 'Dashboard';
+
+            // Load page content
+            const contentContainer = document.getElementById('contentContainer');
+            
+            try {
+                // Dynamically import the module for this page
+                const module = await import(`../js/modules/${pageId}.js`);
+                
+                // Call the init function if it exists
+                if (module.init) {
+                    contentContainer.innerHTML = ''; // Clear previous content
+                    await module.init(contentContainer, user, role);
+                } else if (module.render) {
+                    contentContainer.innerHTML = module.render(user, role);
+                    if (module.loadData) {
+                        await module.loadData();
+                    }
+                }
+                
+                currentModule = module;
+            } catch (error) {
+                console.error(`Failed to load module ${pageId}:`, error);
+                contentContainer.innerHTML = `
+                    <div style="padding: 40px; text-align: center;">
+                        <h2 style="color: #ef5350;"> Không thể tải trang</h2>
+                        <p style="color: #666; margin-top: 10px;">Module "${pageId}" chưa được triển khai hoặc đã xảy ra lỗi.</p>
+                        <p style="color: #999; font-size: 0.9em; margin-top: 20px;">Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Logout function
+        window.logout = function() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                clearAuth();
+                window.location.href = '../index.html';
+            }
+        };
+
+        // Initialize first page
+        if (menuItems.length > 0) {
+            const firstMenuItem = document.querySelector('.menu-item');
+            showPage(menuItems[0].id, firstMenuItem);
+        }
+    </script>
+</body>
+</html>

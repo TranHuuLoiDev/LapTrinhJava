@@ -34,7 +34,6 @@ public class DealerPayable {
     @Column(nullable = false)
     private String status;
 
-    // --- Constructors ---
     public DealerPayable() {}
 
     public DealerPayable(Long dealerId, String invoiceNumber, BigDecimal amountDue, LocalDate dueDate, String status) {
@@ -45,7 +44,6 @@ public class DealerPayable {
         this.status = status;
     }
 
-    // --- Getters & Setters ---
     public Long getPayableId() { return payableId; }
     public void setPayableId(Long payableId) { this.payableId = payableId; }
 

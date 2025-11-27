@@ -26,7 +26,7 @@ public class TestDrive {
     @Column(name = "vehicle_id", nullable = false)
     private Long vehicleId;
 
-    @Column(name = "dealer_id", nullable = false)
+    @Column(name = "dealer_id")
     private Long dealerId;
 
     @Column(name = "preferred_date")
@@ -44,7 +44,6 @@ public class TestDrive {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // --- Constructors ---
     public TestDrive() {}
 
     public TestDrive(Long customerId, Long vehicleId, Long dealerId,
@@ -60,7 +59,6 @@ public class TestDrive {
         this.createdAt = createdAt;
     }
 
-    // --- Getters & Setters ---
     public Long getTestDriveId() { return testDriveId; }
     public void setTestDriveId(Long testDriveId) { this.testDriveId = testDriveId; }
 

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVDMS - Management System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="admin-container"> 
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <h2 class="logo">EVDMS</h2>
+      <nav id="main-nav">
+        <!-- Menu will be dynamically loaded based on role -->
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+      <header class="header">
+        <h1 id="page-title">Dashboard</h1>
+        <div class="admin-info">
+          <span id="user-name">User</span>
+          <span id="user-role" style="font-size: 0.85em; color: #999;">Role</span>
+          <img src="https://cdn-icons-png.flaticon.com/512/2202/2202112.png" alt="User" />
+          <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+      </header>
+
+      <!-- Dashboard -->
+      <section id="dashboard" class="page active">
+        <div class="cards">
+          <div class="card" id="totalVehicles">Xe: ...</div>
+          <div class="card" id="totalCustomers">Khách hàng: ...</div>
+          <div class="card" id="totalOrders">Đơn hàng: ...</div>
+          <div class="card" id="totalFeedbacks">Phản hồi: ...</div>
+          <div class="card" id="totalTestDrives">Lái thử: ...</div>
+        </div>
+        <canvas id="salesChart" height="120"></canvas>
+      </section>
+
+      <!-- EVM Dashboard -->
+      <section id="evmdashboard" class="page">
+        <h2>EVM Management Dashboard</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Total Vehicles</h3>
+            <p id="evm-total-vehicles">0</p>
+          </div>
+          <div class="card">
+            <h3>Total Dealers</h3>
+            <p id="evm-total-dealers">0</p>
+          </div>
+          <div class="card">
+            <h3>Total Customers</h3>
+            <p id="evm-total-customers">0</p>
+          </div>
+          <div class="card">
+            <h3>Total Orders</h3>
+            <p id="evm-total-orders">0</p>
+          </div>
+          <div class="card">
+            <h3>Total Revenue</h3>
+            <p id="evm-total-revenue">0 VND</p>
+          </div>
+          <div class="card">
+            <h3>Total Inventory</h3>
+            <p id="evm-total-inventory">0</p>
+          </div>
+          <div class="card">
+            <h3>Completed Orders</h3>
+            <p id="evm-completed-orders">0</p>
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-top: 20px;">
+          <div class="chart-container">
+            <h3>Monthly Sales</h3>
+            <canvas id="evm-sales-chart" height="250"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>Inventory Summary</h3>
+            <canvas id="evm-inventory-chart" height="250"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>Top 5 Dealer Performance</h3>
+            <canvas id="evm-performance-chart" height="250"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Xe -->
+      <section id="vehicles" class="page">
+        <div id="vehicle-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Khách hàng -->
+      <section id="customers" class="page">
+        <div id="customer-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Đơn hàng -->
+    <section id="orders" class="page">
+        <h2>Danh sách đơn hàng</h2>
+
+        <!-- Form Thêm / Sửa Đơn hàng (đã sửa đúng ID theo JS) -->
+        <div class="form" id="order-form">
+            <input type="hidden" id="so-id" />
+
+            <select id="so-customer">
+                <option value="">Chọn khách hàng</option>
+            </select>
+
+            <input type="number" id="so-total" placeholder="Tổng tiền" />
+
+            <select id="so-status">
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+
+            <select id="so-payment">
+                <option value="Cash">Cash</option>
+                <option value="Installment">Installment</option>
+            </select>
+
+            <input type="date" id="so-date" />
+            <input type="date" id="so-delivery-exp" placeholder="Dự kiến giao" />
+            <input type="date" id="so-delivery-act" placeholder="Ngày giao thực tế" />
+
+            <button type="button" onclick="saveSalesOrder()">Lưu</button>
+            <button type="button" onclick="resetSalesOrderForm()">Hủy</button>
+        </div>
+
+        <!-- Danh sách đơn hàng -->
+        <div id="order-list" class="list-container">Đang tải dữ liệu...</div>
+    </section>
+
+
+      <!-- Phản hồi -->
+      <section id="feedbacks" class="page">
+        <h2>Phản hồi khách hàng</h2>
+        <div id="feedback-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Lái thử -->
+      <section id="testdrives" class="page">
+
+        <!-- Form Thêm / Sửa -->
+        <div class="form" id="testdrive-form">
+          <input type="hidden" id="td-id" />
+          <select id="td-customer">
+            <option value="">Chọn khách hàng</option>
+          </select>
+          <select id="td-vehicle">
+            <option value="">Chọn xe</option>
+          </select>
+          <input type="date" id="td-date" />
+          <input type="time" id="td-time" />
+          <select id="td-status">
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <input type="text" id="td-note" placeholder="Ghi chú" />
+          <button type="button" onclick="saveTestDrive()">Lưu</button>
+          <button type="button" onclick="resetForm()">Hủy</button>
+        </div>
+
+        <div id="testdrive-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Vehicle Specifications -->
+      <section id="vehiclespecs" class="page">
+        <h2>Thông số kỹ thuật xe</h2>
+        
+        <div class="form" id="vehiclespec-form">
+          <input type="hidden" id="spec-id" />
+          <input type="number" id="spec-vehicle-id" placeholder="ID Xe" required />
+          <input type="text" id="spec-battery" placeholder="Dung lượng pin (kWh)" />
+          <input type="number" id="spec-range" placeholder="Tầm hoạt động (km)" />
+          <input type="text" id="spec-charging" placeholder="Thời gian sạc (h)" />
+          <input type="text" id="spec-power" placeholder="Công suất động cơ (HP)" />
+          <input type="number" id="spec-speed" placeholder="Tốc độ tối đa (km/h)" />
+          <input type="number" id="spec-seats" placeholder="Số chỗ ngồi" />
+          <input type="text" id="spec-trunk" placeholder="Dung tích cốp (L)" />
+          <input type="text" id="spec-clearance" placeholder="Khoảng sáng gầm (mm)" />
+          <input type="text" id="spec-wheelbase" placeholder="Chiều dài cơ sở (mm)" />
+          <input type="text" id="spec-dimensions" placeholder="Kích thước (DxRxC)" />
+          <input type="text" id="spec-weight" placeholder="Trọng lượng (kg)" />
+          <input type="text" id="spec-drive" placeholder="Dẫn động (FWD/RWD/AWD)" />
+          <button type="button" onclick="saveVehicleSpec()">Lưu</button>
+          <button type="button" onclick="resetVehicleSpecForm()">Hủy</button>
+        </div>
+
+        <div id="vehiclespec-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Customer Financing -->
+      <section id="financing" class="page">
+        <h2>Quản lý tài chính khách hàng</h2>
+        
+        <div class="form" id="financing-form">
+          <input type="hidden" id="fin-id" />
+          <input type="number" id="fin-customer-id" placeholder="ID Khách hàng" required />
+          <input type="number" id="fin-order-id" placeholder="ID Đơn hàng" required />
+          <input type="text" id="fin-bank" placeholder="Tên ngân hàng" required />
+          <input type="number" id="fin-loan-amount" placeholder="Số tiền vay" required onchange="calculateMonthlyPayment()" />
+          <input type="number" step="0.01" id="fin-interest" placeholder="Lãi suất (%/năm)" required onchange="calculateMonthlyPayment()" />
+          <input type="number" id="fin-term" placeholder="Kỳ hạn (tháng)" required onchange="calculateMonthlyPayment()" />
+          <input type="number" id="fin-down" placeholder="Tiền trả trước" onchange="calculateMonthlyPayment()" />
+          <input type="number" id="fin-monthly" placeholder="Trả hàng tháng" readonly />
+          <select id="fin-status">
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Disbursed">Disbursed</option>
+          </select>
+          <input type="date" id="fin-approved-date" placeholder="Ngày phê duyệt" />
+          <button type="button" onclick="saveFinancing()">Lưu</button>
+          <button type="button" onclick="resetFinancingForm()">Hủy</button>
+        </div>
+
+        <div id="financing-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Customer Interactions -->
+      <section id="interactions" class="page">
+        <h2>Lịch sử tương tác khách hàng</h2>
+        
+        <div class="form" id="interactions-form">
+          <input type="hidden" id="int-id" />
+          <input type="number" id="int-customer-id" placeholder="ID Khách hàng" required />
+          <select id="int-type">
+            <option value="Call">Cuộc gọi</option>
+            <option value="Email">Email</option>
+            <option value="Meeting">Gặp mặt</option>
+            <option value="SMS">SMS</option>
+            <option value="Other">Khác</option>
+          </select>
+          <input type="text" id="int-subject" placeholder="Chủ đề" required />
+          <textarea id="int-notes" placeholder="Nội dung chi tiết" rows="3"></textarea>
+          <input type="datetime-local" id="int-date" required />
+          <input type="datetime-local" id="int-followup" placeholder="Lịch follow-up" />
+          <select id="int-status">
+            <option value="Pending">Pending</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <button type="button" onclick="saveInteraction()">Lưu</button>
+          <button type="button" onclick="resetInteractionForm()">Hủy</button>
+        </div>
+
+        <div id="interactions-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Inventory Transactions -->
+      <section id="inventorytransactions" class="page">
+        <h2>Lịch sử giao dịch kho</h2>
+        
+        <div class="filter-bar">
+          <select id="filter-type" onchange="filterTransactions()">
+            <option value="">Tất cả loại</option>
+            <option value="IN">Nhập kho</option>
+            <option value="OUT">Xuất kho</option>
+            <option value="TRANSFER">Chuyển kho</option>
+            <option value="RETURN">Hoàn trả</option>
+            <option value="ADJUSTMENT">Điều chỉnh</option>
+          </select>
+          <input type="date" id="filter-from-date" onchange="filterTransactions()" placeholder="Từ ngày" />
+          <input type="date" id="filter-to-date" onchange="filterTransactions()" placeholder="Đến ngày" />
+        </div>
+
+        <div class="form" id="inventorytransactions-form">
+          <input type="number" id="invtrans-inventory-id" placeholder="ID Kho" required />
+          <input type="number" id="invtrans-vehicle-id" placeholder="ID Xe" required />
+          <input type="number" id="invtrans-dealer-id" placeholder="ID Đại lý" required />
+          <select id="invtrans-type" required>
+            <option value="IN">Nhập kho</option>
+            <option value="OUT">Xuất kho</option>
+            <option value="TRANSFER">Chuyển kho</option>
+            <option value="RETURN">Hoàn trả</option>
+            <option value="ADJUSTMENT">Điều chỉnh</option>
+          </select>
+          <input type="number" id="invtrans-quantity" placeholder="Số lượng" required />
+          <input type="text" id="invtrans-from" placeholder="Từ vị trí" />
+          <input type="text" id="invtrans-to" placeholder="Đến vị trí" />
+          <input type="text" id="invtrans-ref-type" placeholder="Loại tham chiếu" />
+          <input type="text" id="invtrans-ref-id" placeholder="ID tham chiếu" />
+          <textarea id="invtrans-notes" placeholder="Ghi chú" rows="2"></textarea>
+          <button type="button" onclick="saveInventoryTransaction()">Lưu</button>
+          <button type="button" onclick="resetInventoryTransactionForm()">Hủy</button>
+        </div>
+
+        <div id="inventorytransactions-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+      <!-- Dealer Payments (EVM) -->
+      <section id="dealerpayments" class="page">
+        <h2>Quản lý thanh toán đại lý</h2>
+        
+        <div class="form" id="dealerpayments-form">
+          <input type="hidden" id="dp-id" />
+          <input type="number" id="dp-payable-id" placeholder="ID Công nợ" required />
+          <input type="number" id="dp-dealer-id" placeholder="ID Đại lý" required />
+          <input type="date" id="dp-date" placeholder="Ngày thanh toán" required />
+          <input type="number" step="0.01" id="dp-amount" placeholder="Số tiền" required />
+          <select id="dp-method" required>
+            <option value="Cash">Tiền mặt</option>
+            <option value="BankTransfer">Chuyển khoản</option>
+            <option value="Check">Séc</option>
+            <option value="Other">Khác</option>
+          </select>
+          <input type="text" id="dp-reference" placeholder="Số tham chiếu" />
+          <input type="text" id="dp-bank" placeholder="Tên ngân hàng" />
+          <button type="button" onclick="saveDealerPayment()">Lưu</button>
+          <button type="button" onclick="resetDealerPaymentForm()">Hủy</button>
+        </div>
+
+        <div id="dealerpayments-list" class="list-container">Đang tải dữ liệu...</div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ===================== -->
+  <!-- JS Modules -->
+  <!-- ===================== -->
+   <script type="module">
+    import { urls } from './js/config.js';
+    import { checkAuth, getCurrentUser, getMenuItems, clearAuth } from './js/auth.js';
+    import { showPage } from './js/utils.js';
+    import { loadDashboard } from './js/dashboard.js';
+    import { initEvmDashboard } from './js/evmdashboard.js';
+    import { loadVehicles } from './js/vehicles.js';
+    import { loadCustomers, populateOrderSelects, loadCustomerOptions, loadVehicleOptions } from './js/customers.js';
+    import { loadSalesOrders, saveSalesOrder, deleteSalesOrder, resetSalesOrderForm, editSalesOrder } from './js/Salesorders.js';
+    import { loadTestDrives, saveTestDrive, resetForm, editTestDrive, deleteTestDrive } from './js/testdrives.js';
+    import { loadFeedbacks } from './js/feedbacks.js';
+    import { loadVehicleSpecs, saveVehicleSpec, editVehicleSpec, deleteVehicleSpec, resetVehicleSpecForm } from './js/vehiclespecs.js';
+    import { loadFinancing, saveFinancing, editFinancing, deleteFinancing, resetFinancingForm, calculateMonthlyPayment } from './js/financing.js';
+    import { loadInteractions, saveInteraction, editInteraction, deleteInteraction, resetInteractionForm } from './js/interactions.js';
+    import { loadInventoryTransactions, saveInventoryTransaction, resetInventoryTransactionForm, filterTransactions, viewTransaction } from './js/inventorytransactions.js';
+    import { loadDealerPayments, saveDealerPayment, editDealerPayment, deleteDealerPayment, resetDealerPaymentForm } from './js/dealerpayments.js';
+
+    // Check authentication
+    if (!checkAuth()) {
+        window.location.href = 'login.html';
+    }
+
+    // Initialize UI based on user role
+    function initializeUI() {
+        const user = getCurrentUser();
+        if (!user) return;
+
+        // Update user info
+        document.getElementById('user-name').textContent = user.username || user.fullName || 'User';
+        document.getElementById('user-role').textContent = user.role || 'Role';
+
+        // Generate menu based on role
+        const menuItems = getMenuItems();
+        const nav = document.getElementById('main-nav');
+        const menuHTML = '<ul>' + menuItems.map((item, index) => 
+            `<li class="${index === 0 ? 'active' : ''}" onclick="showPage('${item.id}')" data-page="${item.id}">
+                <span class="menu-icon">${item.icon}</span>
+                <span class="menu-label">${item.label}</span>
+            </li>`
+        ).join('') + '</ul>';
+        nav.innerHTML = menuHTML;
+
+        // Load first page based on role
+        if (menuItems.length > 0) {
+            const firstPage = menuItems[0].id;
+            showPage(firstPage);
+        }
+    }
+
+    // Initialize all modules
+    async function init() {
+        initializeUI();
+        
+        try {
+            await Promise.all([loadCustomerOptions(), loadVehicleOptions()]);
+            
+            // Load all data
+            loadDashboard();
+            loadVehicles();
+            loadCustomers();
+            loadSalesOrders();
+            loadFeedbacks();
+            loadTestDrives();
+            loadVehicleSpecs();
+            loadFinancing();
+            loadInteractions();
+            loadInventoryTransactions();
+            loadDealerPayments();
+        } catch (error) {
+            console.error('Initialization error:', error);
+        }
+    }
+
+    // Logout function
+    window.logout = function() {
+        if (confirm('Bạn có chắc muốn đăng xuất?')) {
+            clearAuth();
+            window.location.href = 'login.html';
+        }
+    };
+
+    // Expose functions to global scope
+    window.showPage = showPage;
+
+    // TestDrive
+    window.saveTestDrive = saveTestDrive;
+    window.resetForm = resetForm;
+    window.editTestDrive = editTestDrive;
+    window.deleteTestDrive = deleteTestDrive;
+
+    // Order
+    window.editSalesOrder = editSalesOrder;
+    window.deleteSalesOrder = deleteSalesOrder;
+    window.saveSalesOrder = saveSalesOrder;
+    window.resetSalesOrderForm = resetSalesOrderForm;
+
+    // Vehicle Specs
+    window.saveVehicleSpec = saveVehicleSpec;
+    window.editVehicleSpec = editVehicleSpec;
+    window.deleteVehicleSpec = deleteVehicleSpec;
+    window.resetVehicleSpecForm = resetVehicleSpecForm;
+
+    // Financing
+    window.saveFinancing = saveFinancing;
+    window.editFinancing = editFinancing;
+    window.deleteFinancing = deleteFinancing;
+    window.resetFinancingForm = resetFinancingForm;
+    window.calculateMonthlyPayment = calculateMonthlyPayment;
+
+    // Interactions
+    window.saveInteraction = saveInteraction;
+    window.editInteraction = editInteraction;
+    window.deleteInteraction = deleteInteraction;
+    window.resetInteractionForm = resetInteractionForm;
+
+    // Inventory Transactions
+    window.saveInventoryTransaction = saveInventoryTransaction;
+    window.resetInventoryTransactionForm = resetInventoryTransactionForm;
+    window.filterTransactions = filterTransactions;
+    window.viewTransaction = viewTransaction;
+
+    // Dealer Payments
+    window.saveDealerPayment = saveDealerPayment;
+    window.editDealerPayment = editDealerPayment;
+    window.deleteDealerPayment = deleteDealerPayment;
+    window.resetDealerPaymentForm = resetDealerPaymentForm;
+
+    // Initialize application
+    init();
+</script>
+
+</body>
+</html>

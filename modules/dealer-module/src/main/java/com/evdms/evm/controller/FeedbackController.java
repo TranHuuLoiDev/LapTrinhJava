@@ -27,25 +27,21 @@ public class FeedbackController {
         this.feedbackService = feedbackService;
     }
 
-    // --- GET tất cả feedback ---
     @GetMapping
     public List<Feedback> getAllFeedbacks() {
         return feedbackService.getAllFeedbacks();
     }
 
-    // --- GET feedback theo ID ---
     @GetMapping("/{id}")
     public Feedback getFeedbackById(@PathVariable("id") Long id) {
         return feedbackService.getFeedbackById(id);
     }
 
-    // --- POST: thêm feedback mới ---
     @PostMapping
     public Feedback addFeedback(@RequestBody Feedback feedback) {
         return feedbackService.saveFeedback(feedback);
     }
 
-    // --- PUT: cập nhật feedback ---
     @PutMapping("/{id}")
     public ResponseEntity<Feedback> updateFeedback(
             @PathVariable("id") Long id,
@@ -58,7 +54,6 @@ public class FeedbackController {
         }
     }
 
-    // --- DELETE feedback ---
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteFeedback(@PathVariable("id") Long id) {
         try {

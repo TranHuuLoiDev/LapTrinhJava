@@ -18,25 +18,21 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    // GET all
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
 
-    // GET by ID
     @SuppressWarnings("null")
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
     }
 
-    // POST
     @SuppressWarnings("null")
     public Customer saveCustomer(Customer customer) {
         return customerRepository.save(customer);
     }
 
-    // PUT
     public Customer updateCustomer(Long id, Customer updatedCustomer) {
         Customer existing = getCustomerById(id);
         existing.setFullName(updatedCustomer.getFullName());
@@ -46,7 +42,6 @@ public class CustomerService {
         return customerRepository.save(existing);
     }
 
-    // DELETE
     @SuppressWarnings("null")
 
     public void deleteCustomer(Long id) {

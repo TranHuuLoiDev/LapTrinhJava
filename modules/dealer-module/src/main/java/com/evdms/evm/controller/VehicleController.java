@@ -27,39 +27,32 @@ public class VehicleController {
         this.vehicleService = vehicleService;
     }
 
-    // --- GET tất cả vehicles ---
     @GetMapping
     public List<Vehicle> getAllVehicles() {
         return vehicleService.getAllVehicles();
     }
 
-    // --- GET vehicle theo ID ---
     @GetMapping("/{id}")
     public Vehicle getVehicleById(@PathVariable("id") Long id) {
         return vehicleService.getVehicleById(id);
     }
-    
-    // --- POST: thêm xe mới ---
+
     @PostMapping
     public Vehicle addVehicle(@RequestBody Vehicle vehicle) {
     return vehicleService.saveVehicle(vehicle);
     }
 
-    
-    // --- DELETE vehicle theo ID ---
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteVehicle(@PathVariable("id") Long id) {
     try {
         vehicleService.deleteVehicle(id);
         return ResponseEntity.ok("Vehicle with ID " + id + " has been deleted");
     } catch (ResponseStatusException e) {
-        // trả 404 nếu vehicle không tồn tại
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getReason());
     }
     }
 
-
-    // --- PUT: cập nhật vehicle ---
     @PutMapping("/{id}")
         public ResponseEntity<Vehicle> updateVehicle(
         @PathVariable("id") Long id,
@@ -69,7 +62,7 @@ public class VehicleController {
         Vehicle vehicle = vehicleService.updateVehicle(id, updatedVehicle);
         return ResponseEntity.ok(vehicle);
     } catch (ResponseStatusException e) {
-        // trả 404 nếu không tồn tại
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     }

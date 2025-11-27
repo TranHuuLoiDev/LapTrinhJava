@@ -29,7 +29,6 @@ public class User {
     @Column(name = "is_active")
     private Boolean isActive = true;
 
-    // --- Constructors ---
     public User() {}
 
     public User(String username, String passwordHash, String fullName, String role, Long dealerId, Boolean isActive) {
@@ -41,7 +40,6 @@ public class User {
         this.isActive = isActive;
     }
 
-    // --- Getters & Setters ---
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
 

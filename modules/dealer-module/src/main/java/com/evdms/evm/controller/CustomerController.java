@@ -27,25 +27,21 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    // GET all
     @GetMapping
     public List<Customer> getAllCustomers() {
         return customerService.getAllCustomers();
     }
 
-    // GET by ID
     @GetMapping("/{id}")
     public Customer getCustomerById(@PathVariable("id") Long id) {
         return customerService.getCustomerById(id);
     }
 
-    // POST
     @PostMapping
     public Customer addCustomer(@RequestBody Customer customer) {
         return customerService.saveCustomer(customer);
     }
 
-    // PUT
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(
             @PathVariable("id") Long id,
@@ -58,7 +54,6 @@ public class CustomerController {
         }
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCustomer(@PathVariable("id") Long id) {
         try {

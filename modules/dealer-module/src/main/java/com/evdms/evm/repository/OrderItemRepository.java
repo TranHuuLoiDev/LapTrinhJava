@@ -7,5 +7,5 @@ import com.evdms.evm.model.OrderItem;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
-    // JpaRepository đã cung cấp sẵn findAll(), findById(), save(), delete()...
+
 }
