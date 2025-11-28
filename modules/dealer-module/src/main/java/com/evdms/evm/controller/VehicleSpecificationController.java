@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/vehicle-specifications")
+@RequestMapping("/api/vehiclespecifications")
 @CrossOrigin(origins = "*")
 public class VehicleSpecificationController {
     

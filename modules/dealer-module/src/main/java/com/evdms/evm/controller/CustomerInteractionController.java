@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/customer-interactions")
+@RequestMapping("/api/customerinteractions")
 @CrossOrigin(origins = "*")
 public class CustomerInteractionController {
     

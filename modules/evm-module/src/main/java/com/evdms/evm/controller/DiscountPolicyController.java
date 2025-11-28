@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/discount-policies")
+@RequestMapping("/api/discountpolicies")
 public class DiscountPolicyController {
     @Autowired
     private DiscountPolicyService discountPolicyService;

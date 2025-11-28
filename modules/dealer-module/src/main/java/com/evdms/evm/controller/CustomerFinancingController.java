@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/customer-financing")
+@RequestMapping("/api/customerfinancing")
 @CrossOrigin(origins = "*")
 public class CustomerFinancingController {
     

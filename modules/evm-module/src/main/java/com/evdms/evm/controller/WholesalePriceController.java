@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/wholesale-prices")
+@RequestMapping("/api/wholesaleprices")
 public class WholesalePriceController {
     @Autowired
     private WholesalePriceService wholesalePriceService;

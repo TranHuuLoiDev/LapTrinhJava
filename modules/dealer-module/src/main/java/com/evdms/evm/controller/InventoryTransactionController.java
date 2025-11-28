@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/inventory-transactions")
+@RequestMapping("/api/inventorytransactions")
 @CrossOrigin(origins = "*")
 public class InventoryTransactionController {
     

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/dealer-payments")
+@RequestMapping("/api/dealerpayments")
 @CrossOrigin(origins = "*")
 public class DealerPaymentController {
     

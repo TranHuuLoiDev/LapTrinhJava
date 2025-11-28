@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "discount_policies")
+@Table(name = "discountpolicies")
 public class DiscountPolicy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
