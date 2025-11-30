@@ -306,15 +306,14 @@
 
         // Initialize menu
         const menu = [
-            { id: 'dashboard', label: 'Dashboard', icon: '' },
-            { id: 'vehicles', label: 'Danh sách Xe', icon: '' },
-            { id: 'customers', label: 'Khách hàng', icon: '' },
-            { id: 'orders', label: 'Đơn hàng', icon: '' },
-            { id: 'financing', label: 'Tài chính KH', icon: '' },
-            { id: 'testdrives', label: 'Lái thử', icon: '' },
-            { id: 'feedbacks', label: 'Phản hồi', icon: '' },
-            { id: 'interactions', label: 'Tương tác KH', icon: '' },
-            { id: 'reports', label: 'Báo cáo', icon: '' }
+            { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+            { id: 'vehicles', label: 'Danh sách Xe', icon: '🚗' },
+            { id: 'vehiclecomparison', label: 'So sánh Xe', icon: '⚖️' },
+            { id: 'customers', label: 'Khách hàng', icon: '👥' },
+            { id: 'orders', label: 'Đơn hàng', icon: '📋' },
+            { id: 'testdrives', label: 'Lái thử', icon: '🏁' },
+            { id: 'feedbacks', label: 'Phản hồi', icon: '💬' },
+            { id: 'reports', label: 'Báo cáo', icon: '📈' }
         ];
 
         const menuNav = document.getElementById('menuNav');
@@ -331,12 +330,19 @@
         });
 
         // Show page function
-        window.showPage = function(pageId) {
+        window.showPage = async function(pageId) {
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
             });
             document.getElementById(pageId).classList.add('active');
             document.getElementById('pageTitle').textContent = menu.find(m => m.id === pageId)?.label || 'Dashboard';
+            
+            // Load vehicle comparison module dynamically
+            if (pageId === 'vehiclecomparison') {
+                const container = document.getElementById('vehiclecomparison');
+                const { init } = await import('../js/modules/vehiclecomparison.js');
+                await init(container);
+            }
         };
 
         // User info
@@ -354,10 +360,9 @@
 
         // Expose form functions (will be implemented by imported modules)
         window.showCustomerForm = () => console.log('Show customer form');
+        window.showVehicleForm = () => console.log('Show vehicle form');
         window.showOrderForm = () => console.log('Show order form');
-        window.showFinancingForm = () => console.log('Show financing form');
         window.showTestDriveForm = () => console.log('Show test drive form');
-        window.showInteractionForm = () => console.log('Show interaction form');
 
         // Load initial data
         async function init() {
@@ -366,9 +371,7 @@
                 loadCustomers(),
                 loadOrders(),
                 loadTestDrives(),
-                loadFeedbacks(),
-                loadFinancing(),
-                loadInteractions()
+                loadFeedbacks()
             ]);
             updateDashboardStats();
             initCharts();
@@ -380,7 +383,6 @@
             document.getElementById('totalOrders').textContent = document.querySelectorAll('#ordersList tr').length;
             document.getElementById('totalFeedbacks').textContent = document.querySelectorAll('#feedbacksList tr').length;
             document.getElementById('totalTestDrives').textContent = document.querySelectorAll('#testDrivesList tr').length;
-            document.getElementById('totalFinancing').textContent = document.querySelectorAll('#financingList tr').length;
         }
 
         function initCharts() {

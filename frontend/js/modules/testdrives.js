@@ -6,9 +6,14 @@ import { fetchJson } from './utils.js';
 // =====================
 export async function init(container) {
     container.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <button onclick="window.testDriveModule.showAddForm()" class="btn-primary" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                Thêm lịch lái thử mới
+            </button>
+        </div>
         <div id="testdrive-list">Đang tải...</div>
         <div id="testdrive-form" style="display: none; margin-top: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <h3 style="margin-bottom: 20px;"> Form Sửa Lái thử</h3>
+            <h3 id="form-title" style="margin-bottom: 20px;">Form Lái thử</h3>
             <input type="hidden" id="td-id">
             
             <div style="margin-bottom: 15px;">
@@ -60,6 +65,7 @@ export async function init(container) {
     
     // Expose functions to window
     window.testDriveModule = {
+        showAddForm,
         editTestDrive,
         deleteTestDrive,
         saveTestDrive,
@@ -72,6 +78,27 @@ export async function init(container) {
     
     await loadTestDrives();
     await loadDropdownData();
+}
+
+// =====================
+// Show Add Form
+// =====================
+function showAddForm() {
+    document.getElementById('testdrive-form').style.display = 'block';
+    document.getElementById('form-title').textContent = 'Thêm lịch lái thử mới';
+    document.getElementById('td-id').value = '';
+    
+    // Set default values
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('td-date').value = today;
+    document.getElementById('td-time').value = '09:00';
+    document.getElementById('td-status').value = 'Pending';
+    document.getElementById('td-customer').value = '';
+    document.getElementById('td-vehicle').value = '';
+    document.getElementById('td-note').value = '';
+    
+    // Scroll to form
+    document.getElementById('testdrive-form').scrollIntoView({ behavior: 'smooth' });
 }
 
 // =====================
@@ -140,6 +167,9 @@ export function editTestDrive(id) {
     const form = document.getElementById("testdrive-form");
     if (form) form.style.display = 'block';
     
+    // Update form title
+    document.getElementById('form-title').textContent = 'Sửa lịch lái thử';
+    
     // Populate form fields
     document.getElementById("td-id").value = t.testDriveId;
     document.getElementById("td-customer").value = t.customerId;
@@ -148,6 +178,9 @@ export function editTestDrive(id) {
     document.getElementById("td-time").value = t.preferredTime;
     document.getElementById("td-status").value = t.status;
     document.getElementById("td-note").value = t.note || '';
+    
+    // Scroll to form
+    form.scrollIntoView({ behavior: 'smooth' });
 }
 
 // =====================
@@ -198,6 +231,7 @@ export async function saveTestDrive() {
 
     try {
         if (id) {
+            // Update existing
             const res = await fetch(`${urls.testdrives}/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -205,7 +239,9 @@ export async function saveTestDrive() {
                 body: JSON.stringify(payload)
             });
             if (!res.ok) throw new Error(`Lỗi cập nhật: ${res.status}`);
+            alert("Cập nhật lịch lái thử thành công!");
         } else {
+            // Create new
             const res = await fetch(urls.testdrives, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -213,8 +249,8 @@ export async function saveTestDrive() {
                 body: JSON.stringify(payload)
             });
             if (!res.ok) throw new Error(`Lỗi thêm mới: ${res.status}`);
+            alert("Thêm lịch lái thử mới thành công!");
         }
-        alert("Lưu thành công!");
         resetForm();
         loadTestDrives();
     } catch (err) {
@@ -226,14 +262,14 @@ export async function saveTestDrive() {
 // Delete TestDrive
 // =====================
 export async function deleteTestDrive(id) {
-    if (!confirm("Bạn có chắc muốn xóa lịch lái thử này?")) return;
+    if (!confirm("Bạn có chắc muốn xóa lịch lái thử này?\n\nHành động này không thể hoàn tác!")) return;
     try {
         const res = await fetch(`${urls.testdrives}/${id}`, { 
             method: "DELETE",
             credentials: 'include'
         });
         if (!res.ok) throw new Error(`Lỗi xóa: ${res.status}`);
-        alert("Xóa thành công!");
+        alert("Xóa lịch lái thử thành công!");
         loadTestDrives();
     } catch (err) {
         alert(err.message);
@@ -245,7 +281,12 @@ export async function deleteTestDrive(id) {
 // =====================
 export function resetForm() {
     const form = document.getElementById("testdrive-form");
-    if (form) form.style.display = 'none';
+    if (form) {
+        form.style.display = 'none';
+        
+        // Scroll back to list
+        document.getElementById("testdrive-list").scrollIntoView({ behavior: 'smooth' });
+    }
     
     document.getElementById("td-id").value = '';
     document.getElementById("td-customer").value = '';

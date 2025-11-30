@@ -11,18 +11,20 @@ export const urls = {
     testdrives: "http://localhost:8080/api/testdrives",
     orderitems: "http://localhost:8080/api/orderitems",
     // New modules
-    vehicleSpecs: "http://localhost:8080/api/vehicle-specifications",
-    financing: "http://localhost:8080/api/customer-financing",
-    interactions: "http://localhost:8080/api/customer-interactions",
+    vehicleSpecs: "http://localhost:8080/api/vehiclespecifications",
     inventoryTransactions: "http://localhost:8080/api/inventory-transactions",
-    dealerPayments: "http://localhost:8080/api/dealer-payments",
+    dealerPayments: "http://localhost:8080/api/dealerpayments",
     // EVM modules
     dealers: "http://localhost:8080/api/dealers",
     inventory: "http://localhost:8080/api/inventories",
-    promotions: "http://localhost:8080/api/promotions",
+    promotions: "http://localhost:8080/api/evm/promotions",
     wholesalePrices: "http://localhost:8080/api/wholesale-prices",
     dealerContracts: "http://localhost:8080/api/dealer-contracts",
-    dealerTargets: "http://localhost:8080/api/dealer-targets"
+    dealerTargets: "http://localhost:8080/api/dealer-targets",
+    // Reports API
+    reports: "http://localhost:8080/api/reports",
+    // Vehicle Comparison API
+    vehicleComparisons: "http://localhost:8080/api/vehicle-comparisons"
 };
 
 // User roles

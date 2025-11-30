@@ -58,13 +58,6 @@
                             <p class="stat-number" id="totalTestDrives">...</p>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"></div>
-                        <div class="stat-info">
-                            <h3>Tương tác gần đây</h3>
-                            <p class="stat-number" id="totalInteractions">...</p>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -86,6 +79,11 @@
                         <tbody id="vehiclesList"></tbody>
                     </table>
                 </div>
+            </section>
+
+            <!-- Vehicle Comparison Section -->
+            <section id="vehiclecomparison" class="content-section">
+                <!-- Content will be loaded dynamically by vehiclecomparison.js -->
             </section>
 
             <!-- Customers Section -->
@@ -186,70 +184,6 @@
                 </div>
             </section>
 
-            <!-- Interactions Section -->
-            <section id="interactions" class="content-section">
-                <h2>Tương tác Khách hàng</h2>
-                <button class="btn btn-add" onclick="showInteractionForm()">+ Ghi nhận tương tác</button>
-                
-                <div id="interactionForm" class="form-container" style="display: none;">
-                    <h3>Ghi nhận tương tác</h3>
-                    <form id="interactionFormElement">
-                        <input type="hidden" id="interactionId">
-                        <div class="form-group">
-                            <label>Khách hàng:</label>
-                            <select id="interactionCustomer" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Loại:</label>
-                            <select id="interactionType" required>
-                                <option value="Call">Điện thoại</option>
-                                <option value="Email">Email</option>
-                                <option value="Meeting">Gặp mặt</option>
-                                <option value="SMS">SMS</option>
-                                <option value="Other">Khác</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Chủ đề:</label>
-                            <input type="text" id="interactionSubject" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Ghi chú:</label>
-                            <textarea id="interactionNotes" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Ngày tương tác:</label>
-                            <input type="datetime-local" id="interactionDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Follow-up:</label>
-                            <input type="datetime-local" id="interactionFollowUp">
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Lưu</button>
-                            <button type="button" class="btn btn-secondary" onclick="resetInteractionForm()">Hủy</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Khách hàng</th>
-                                <th>Loại</th>
-                                <th>Chủ đề</th>
-                                <th>Ngày</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="interactionsList"></tbody>
-                    </table>
-                </div>
-            </section>
-
         </main>
     </div>
 
@@ -258,7 +192,6 @@
         import { loadVehicles } from '../assets/js/vehicles.js';
         import { loadCustomers, displayCustomers, editCustomer, saveCustomer, resetCustomerForm } from '../assets/js/customers.js';
         import { loadTestDrives, displayTestDrives, editTestDrive, saveTestDrive, resetTestDriveForm } from '../assets/js/testdrives.js';
-        import { loadInteractions, displayInteractions, editInteraction, saveInteraction, resetInteractionForm } from '../assets/js/interactions.js';
 
         // Check authentication
         if (!checkAuth()) {
@@ -274,11 +207,11 @@
 
         // Initialize menu
         const menu = [
-            { id: 'dashboard', label: 'Dashboard', icon: '' },
-            { id: 'vehicles', label: 'Danh sách Xe', icon: '' },
-            { id: 'customers', label: 'Khách hàng', icon: '' },
-            { id: 'testdrives', label: 'Lái thử', icon: '' },
-            { id: 'interactions', label: 'Tương tác KH', icon: '' }
+            { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+            { id: 'vehicles', label: 'Danh sách Xe', icon: '🚗' },
+            { id: 'vehiclecomparison', label: 'So sánh Xe', icon: '⚖️' },
+            { id: 'customers', label: 'Khách hàng', icon: '👥' },
+            { id: 'testdrives', label: 'Lái thử', icon: '🏁' }
         ];
 
         const menuNav = document.getElementById('menuNav');
@@ -295,12 +228,19 @@
         });
 
         // Show page function
-        function showPage(pageId) {
+        async function showPage(pageId) {
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
             });
             document.getElementById(pageId).classList.add('active');
             document.getElementById('pageTitle').textContent = menu.find(m => m.id === pageId)?.label || 'Dashboard';
+            
+            // Load vehicle comparison module dynamically
+            if (pageId === 'vehiclecomparison') {
+                const container = document.getElementById('vehiclecomparison');
+                const { init } = await import('../js/modules/vehiclecomparison.js');
+                await init(container);
+            }
         }
 
         // User info
@@ -326,11 +266,6 @@
         window.resetTestDriveForm = resetTestDriveForm;
         window.editTestDrive = editTestDrive;
         window.saveTestDrive = saveTestDrive;
-        
-        window.showInteractionForm = () => document.getElementById('interactionForm').style.display = 'block';
-        window.resetInteractionForm = resetInteractionForm;
-        window.editInteraction = editInteraction;
-        window.saveInteraction = saveInteraction;
 
         // Form submissions
         document.getElementById('customerFormElement').addEventListener('submit', (e) => {
@@ -343,17 +278,11 @@
             saveTestDrive();
         });
 
-        document.getElementById('interactionFormElement').addEventListener('submit', (e) => {
-            e.preventDefault();
-            saveInteraction();
-        });
-
         // Load initial data
         async function init() {
             await loadVehicles();
             await loadCustomers();
             await loadTestDrives();
-            await loadInteractions();
             updateDashboardStats();
         }
 
@@ -362,7 +291,6 @@
             document.getElementById('totalVehicles').textContent = document.querySelectorAll('#vehiclesList tr').length;
             document.getElementById('totalCustomers').textContent = document.querySelectorAll('#customersList tr').length;
             document.getElementById('totalTestDrives').textContent = document.querySelectorAll('#testDrivesList tr').length;
-            document.getElementById('totalInteractions').textContent = document.querySelectorAll('#interactionsList tr').length;
         }
 
         init();

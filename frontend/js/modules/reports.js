@@ -61,232 +61,183 @@ export async function init(container) {
 }
 
 // =====================
-// Sales Report
+// Sales Report - Sử dụng API backend
 // =====================
 async function showSalesReport() {
     const container = document.getElementById('report-content');
-    container.innerHTML = '<p style="text-align: center; padding: 40px;">Đang tải báo cáo...</p>';
+    container.innerHTML = '<p style="text-align: center; padding: 40px;">⏳ Đang tải báo cáo doanh số...</p>';
     
     try {
-        const orders = await fetchWithAuth(urls.orders).then(r => r.json());
-        const customers = await fetchWithAuth(urls.customers).then(r => r.json());
-        
-        // Calculate sales by staff (mock data - you need user/staff info)
-        const totalOrders = orders.length;
-        const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
-        const completedOrders = orders.filter(o => o.status === 'Delivered').length;
-        
-        // Group by month
-        const salesByMonth = {};
-        orders.forEach(order => {
-            if (order.orderDate) {
-                const month = new Date(order.orderDate).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long' });
-                salesByMonth[month] = (salesByMonth[month] || 0) + 1;
-            }
-        });
+        // Gọi API backend để lấy báo cáo doanh số
+        const response = await fetchWithAuth(`${urls.reports}/sales`);
+        const salesReport = await response.json();
         
         container.innerHTML = `
-            <h3 style="margin-bottom: 20px;"> Báo cáo Doanh số Bán hàng</h3>
+            <h3 style="margin-bottom: 20px;">📊 Báo cáo Doanh số Bán hàng</h3>
             
             <!-- Summary Cards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
                 <div style="padding: 20px; background: #e3f2fd; border-radius: 8px;">
                     <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Tổng đơn hàng</div>
-                    <div style="font-size: 2em; font-weight: 700; color: #1976d2;">${totalOrders}</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #1976d2;">${salesReport.totalOrders || 0}</div>
                 </div>
                 <div style="padding: 20px; background: #e8f5e9; border-radius: 8px;">
                     <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Đơn hoàn thành</div>
-                    <div style="font-size: 2em; font-weight: 700; color: #388e3c;">${completedOrders}</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #388e3c;">${salesReport.completedOrders || 0}</div>
                 </div>
                 <div style="padding: 20px; background: #fff3e0; border-radius: 8px;">
                     <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Tổng doanh thu</div>
-                    <div style="font-size: 1.5em; font-weight: 700; color: #f57c00;">${totalRevenue.toLocaleString('vi-VN')} ₫</div>
+                    <div style="font-size: 1.5em; font-weight: 700; color: #f57c00;">${(salesReport.totalRevenue || 0).toLocaleString('vi-VN')} ₫</div>
                 </div>
                 <div style="padding: 20px; background: #fce4ec; border-radius: 8px;">
                     <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Tỷ lệ hoàn thành</div>
-                    <div style="font-size: 2em; font-weight: 700; color: #c2185b;">${totalOrders > 0 ? Math.round((completedOrders / totalOrders) * 100) : 0}%</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #c2185b;">${Math.round((salesReport.completionRate || 0) * 100)}%</div>
                 </div>
             </div>
             
-            <!-- Sales by Month -->
-            <h4 style="margin-bottom: 15px;">Doanh số theo tháng</h4>
+            <!-- Sales by Dealer -->
+            ${salesReport.salesByDealer && salesReport.salesByDealer.length > 0 ? `
+            <h4 style="margin-bottom: 15px;">📈 Doanh số theo Đại lý</h4>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
                 <thead>
                     <tr style="background: #f5f5f5;">
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Tháng</th>
-                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Số đơn hàng</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Đại lý</th>
+                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Số đơn</th>
+                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Doanh thu</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${Object.entries(salesByMonth).map(([month, count]) => `
+                    ${salesReport.salesByDealer.map(item => `
                         <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee;">${month}</td>
-                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; font-weight: 600;">${count}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.dealerName || 'N/A'}</td>
+                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; font-weight: 600;">${item.totalOrders || 0}</td>
+                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; font-weight: 600; color: #2e7d32;">${(item.totalRevenue || 0).toLocaleString('vi-VN')} ₫</td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-            
-            <!-- Recent Orders -->
-            <h4 style="margin-bottom: 15px;">Đơn hàng gần đây</h4>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: #f5f5f5;">
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">ID</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Ngày đặt</th>
-                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Tổng tiền</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Trạng thái</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${orders.slice(0, 10).map(order => `
-                        <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee;">#${order.orderId}</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee;">${new Date(order.orderDate).toLocaleDateString('vi-VN')}</td>
-                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; font-weight: 600;">${(order.totalAmount || 0).toLocaleString('vi-VN')} ₫</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
-                                <span style="padding: 4px 12px; background: ${getOrderStatusColor(order.status)}; color: white; border-radius: 12px; font-size: 0.85em;">
-                                    ${order.status}
-                                </span>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+            ` : '<p style="color: #999; text-align: center;">Chưa có dữ liệu doanh số theo đại lý</p>'}
         `;
     } catch (error) {
         console.error('Error loading sales report:', error);
-        container.innerHTML = '<p style="color: red; text-align: center; padding: 40px;">Không thể tải báo cáo doanh số</p>';
+        container.innerHTML = '<p style="color: red; text-align: center; padding: 40px;">❌ Không thể tải báo cáo doanh số. Vui lòng thử lại sau.</p>';
     }
 }
 
 // =====================
-// Revenue Report
+// Revenue Report - Sử dụng API backend
 // =====================
 async function showRevenueReport() {
     const container = document.getElementById('report-content');
-    container.innerHTML = '<p style="text-align: center; padding: 40px;">Đang tải báo cáo...</p>';
+    container.innerHTML = '<p style="text-align: center; padding: 40px;">⏳ Đang tải báo cáo doanh thu...</p>';
     
     try {
-        const orders = await fetchWithAuth(urls.orders).then(r => r.json());
+        // Gọi API backend ReportService
+        const response = await fetchWithAuth(`${urls.reports}/dealer-payables`);
+        const payablesReport = await response.json();
         
-        // Calculate revenue by month
-        const revenueByMonth = {};
-        const currentYear = new Date().getFullYear();
-        
-        orders.forEach(order => {
-            if (order.orderDate && order.totalAmount) {
-                const date = new Date(order.orderDate);
-                if (date.getFullYear() === currentYear) {
-                    const month = date.getMonth() + 1;
-                    revenueByMonth[month] = (revenueByMonth[month] || 0) + order.totalAmount;
-                }
-            }
-        });
-        
-        const monthlyRevenue = Array.from({ length: 12 }, (_, i) => ({
-            month: `Tháng ${i + 1}`,
-            revenue: revenueByMonth[i + 1] || 0
-        }));
-        
-        const totalYearRevenue = Object.values(revenueByMonth).reduce((sum, val) => sum + val, 0);
-        const avgMonthlyRevenue = totalYearRevenue / 12;
+        const totalPayables = payablesReport.reduce((sum, item) => sum + (item.totalPayable || 0), 0);
+        const avgPayable = payablesReport.length > 0 ? totalPayables / payablesReport.length : 0;
         
         container.innerHTML = `
-            <h3 style="margin-bottom: 20px;"> Báo cáo Doanh thu ${currentYear}</h3>
+            <h3 style="margin-bottom: 20px;">💰 Báo cáo Công nợ Phải thu</h3>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
                 <div style="padding: 20px; background: #e8f5e9; border-radius: 8px;">
-                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Tổng doanh thu năm</div>
-                    <div style="font-size: 1.3em; font-weight: 700; color: #388e3c;">${totalYearRevenue.toLocaleString('vi-VN')} ₫</div>
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Tổng công nợ</div>
+                    <div style="font-size: 1.3em; font-weight: 700; color: #388e3c;">${totalPayables.toLocaleString('vi-VN')} ₫</div>
                 </div>
                 <div style="padding: 20px; background: #e3f2fd; border-radius: 8px;">
-                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Trung bình/tháng</div>
-                    <div style="font-size: 1.3em; font-weight: 700; color: #1976d2;">${avgMonthlyRevenue.toLocaleString('vi-VN')} ₫</div>
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Số đại lý nợ</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #1976d2;">${payablesReport.length}</div>
+                </div>
+                <div style="padding: 20px; background: #fff3e0; border-radius: 8px;">
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Trung bình</div>
+                    <div style="font-size: 1.3em; font-weight: 700; color: #f57c00;">${avgPayable.toLocaleString('vi-VN')} ₫</div>
                 </div>
             </div>
             
-            <h4 style="margin-bottom: 15px;">Doanh thu theo tháng</h4>
+            <h4 style="margin-bottom: 15px;">📊 Công nợ theo Đại lý</h4>
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background: #f5f5f5;">
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Tháng</th>
-                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Doanh thu</th>
-                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Tăng trưởng</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Đại lý</th>
+                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Tổng nợ</th>
+                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Đã trả</th>
+                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Còn lại</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${monthlyRevenue.map((item, index) => {
-                        const prevRevenue = index > 0 ? monthlyRevenue[index - 1].revenue : 0;
-                        const growth = prevRevenue > 0 ? ((item.revenue - prevRevenue) / prevRevenue * 100).toFixed(1) : 0;
-                        return `
+                    ${payablesReport.map(item => `
                         <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.month}</td>
-                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; font-weight: 600;">${item.revenue.toLocaleString('vi-VN')} ₫</td>
-                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; color: ${growth >= 0 ? '#4caf50' : '#ef5350'};">
-                                ${growth >= 0 ? '+' : ''}${growth}%
-                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: 600;">${item.dealerName || 'N/A'}</td>
+                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">${(item.totalPayable || 0).toLocaleString('vi-VN')} ₫</td>
+                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; color: #4caf50;">${(item.totalPaid || 0).toLocaleString('vi-VN')} ₫</td>
+                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; color: #f44336; font-weight: 600;">${(item.remainingBalance || 0).toLocaleString('vi-VN')} ₫</td>
                         </tr>
-                    `}).join('')}
+                    `).join('')}
                 </tbody>
             </table>
         `;
     } catch (error) {
         console.error('Error loading revenue report:', error);
-        container.innerHTML = '<p style="color: red; text-align: center; padding: 40px;">Không thể tải báo cáo doanh thu</p>';
+        container.innerHTML = '<p style="color: red; text-align: center; padding: 40px;">❌ Không thể tải báo cáo doanh thu. Vui lòng thử lại sau.</p>';
     }
 }
 
 // =====================
-// Inventory Report
+// Inventory Report - Sử dụng API backend
 // =====================
 async function showInventoryReport() {
     const container = document.getElementById('report-content');
-    container.innerHTML = '<p style="text-align: center; padding: 40px;">Đang tải báo cáo...</p>';
+    container.innerHTML = '<p style="text-align: center; padding: 40px;">⏳ Đang tải báo cáo tồn kho...</p>';
     
     try {
-        const vehicles = await fetchWithAuth(urls.vehicles).then(r => r.json());
+        // Gọi API backend ReportService
+        const response = await fetchWithAuth(`${urls.reports}/inventory`);
+        const inventoryReport = await response.json();
         
-        const totalVehicles = vehicles.length;
-        const availableVehicles = vehicles.filter(v => v.status === 'Available' || !v.status).length;
+        const totalVehicles = inventoryReport.length;
+        const totalQuantity = inventoryReport.reduce((sum, item) => sum + (item.quantity || 0), 0);
+        const totalValue = inventoryReport.reduce((sum, item) => sum + ((item.quantity || 0) * (item.retailPrice || 0)), 0);
         
         container.innerHTML = `
-            <h3 style="margin-bottom: 20px;"> Báo cáo Tồn kho</h3>
+            <h3 style="margin-bottom: 20px;">📦 Báo cáo Tồn kho</h3>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
                 <div style="padding: 20px; background: #e3f2fd; border-radius: 8px;">
-                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Tổng số xe</div>
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Số loại xe</div>
                     <div style="font-size: 2em; font-weight: 700; color: #1976d2;">${totalVehicles}</div>
                 </div>
                 <div style="padding: 20px; background: #e8f5e9; border-radius: 8px;">
-                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Xe có sẵn</div>
-                    <div style="font-size: 2em; font-weight: 700; color: #388e3c;">${availableVehicles}</div>
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Tổng số lượng</div>
+                    <div style="font-size: 2em; font-weight: 700; color: #388e3c;">${totalQuantity}</div>
+                </div>
+                <div style="padding: 20px; background: #fff3e0; border-radius: 8px;">
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">Giá trị kho</div>
+                    <div style="font-size: 1.3em; font-weight: 700; color: #f57c00;">${totalValue.toLocaleString('vi-VN')} ₫</div>
                 </div>
             </div>
             
-            <h4 style="margin-bottom: 15px;">Chi tiết tồn kho</h4>
+            <h4 style="margin-bottom: 15px;">📊 Chi tiết tồn kho</h4>
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background: #f5f5f5;">
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">ID</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Mã xe</th>
                         <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Tên xe</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Màu sắc</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Đại lý</th>
+                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Số lượng</th>
                         <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Giá bán</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Trạng thái</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${vehicles.map(vehicle => `
+                    ${inventoryReport.map(item => `
                         <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee;">${vehicle.vehicleId}</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: 600;">${vehicle.modelName || 'N/A'}</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee;">${vehicle.color || 'N/A'}</td>
-                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">${(vehicle.retailPrice || 0).toLocaleString('vi-VN')} ₫</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
-                                <span style="padding: 4px 12px; background: ${vehicle.status === 'Available' ? '#4caf50' : '#ff9800'}; color: white; border-radius: 12px; font-size: 0.85em;">
-                                    ${vehicle.status || 'Available'}
-                                </span>
-                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.vehicleId || 'N/A'}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: 600;">${item.modelName || 'N/A'}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.dealerName || 'N/A'}</td>
+                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee; font-weight: 600; color: ${(item.quantity || 0) > 5 ? '#4caf50' : '#ff9800'};">${item.quantity || 0}</td>
+                            <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">${(item.retailPrice || 0).toLocaleString('vi-VN')} ₫</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -294,7 +245,7 @@ async function showInventoryReport() {
         `;
     } catch (error) {
         console.error('Error loading inventory report:', error);
-        container.innerHTML = '<p style="color: red; text-align: center; padding: 40px;">Không thể tải báo cáo tồn kho</p>';
+        container.innerHTML = '<p style="color: red; text-align: center; padding: 40px;">❌ Không thể tải báo cáo tồn kho. Vui lòng thử lại sau.</p>';
     }
 }
 

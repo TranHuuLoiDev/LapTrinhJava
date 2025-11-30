@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/dealerpayments")
-@CrossOrigin(origins = "*")
 public class DealerPaymentController {
     
     @Autowired
     private DealerPaymentService dealerPaymentService;
     
     @GetMapping
-    public ResponseEntity<List<DealerPayment>> getAllPayments() {
-        List<DealerPayment> payments = dealerPaymentService.getAllPayments();
+    public ResponseEntity<List<Map<String, Object>>> getAllPayments() {
+        List<Map<String, Object>> payments = dealerPaymentService.getAllPayments();
         return ResponseEntity.ok(payments);
     }
     

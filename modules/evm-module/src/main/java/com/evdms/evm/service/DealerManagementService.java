@@ -1,18 +1,25 @@
 package com.evdms.evm.service;
 
-import com.evdms.evm.model.Dealer;
-import com.evdms.evm.repository.DealerRepository;
-import com.evdms.evm.model.SalesOrder;
-import com.evdms.evm.repository.SalesOrderRepository;
-import com.evdms.evm.model.DealerPayable;
-import com.evdms.evm.repository.DealerPayableRepository;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.evdms.evm.controller.DealerManagementController.DealerRequest;
+import com.evdms.evm.model.Dealer;
+import com.evdms.evm.model.DealerPayable;
+import com.evdms.evm.model.SalesOrder;
+import com.evdms.evm.repository.DealerPayableRepository;
+import com.evdms.evm.repository.DealerRepository;
+import com.evdms.evm.repository.SalesOrderRepository;
 
 @Service
 @Transactional
@@ -29,6 +36,102 @@ public class DealerManagementService {
         this.dealerRepository = dealerRepository;
         this.salesOrderRepository = salesOrderRepository;
         this.dealerPayableRepository = dealerPayableRepository;
+    }
+
+    // Get all dealers
+    public List<Map<String, Object>> getAllDealers() {
+        List<Dealer> dealers = dealerRepository.findAll();
+        List<Map<String, Object>> result = new ArrayList<>();
+        
+        for (Dealer dealer : dealers) {
+            Map<String, Object> dealerMap = new HashMap<>();
+            dealerMap.put("dealerId", dealer.getDealerId());
+            dealerMap.put("dealerName", dealer.getDealerName());
+            dealerMap.put("address", dealer.getAddress());
+            dealerMap.put("phone", dealer.getPhone());
+            dealerMap.put("contractStartDate", dealer.getContractStartDate());
+            dealerMap.put("salesQuota", dealer.getSalesQuota());
+            dealerMap.put("isActive", true); // Default value
+            result.add(dealerMap);
+        }
+        
+        return result;
+    }
+    
+    // Create new dealer
+    public Map<String, Object> createDealer(DealerRequest request) {
+        Dealer dealer = new Dealer();
+        dealer.setDealerName(request.dealerName);
+        dealer.setAddress(request.address);
+        dealer.setPhone(request.phone);
+        
+        if (request.contractStartDate != null && !request.contractStartDate.isEmpty()) {
+            try {
+                dealer.setContractStartDate(LocalDate.parse(request.contractStartDate));
+            } catch (Exception e) {
+                // Ignore parse error
+            }
+        }
+        
+        if (request.salesQuota != null) {
+            dealer.setSalesQuota(BigDecimal.valueOf(request.salesQuota));
+        }
+        
+        Dealer savedDealer = dealerRepository.save(dealer);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("dealerId", savedDealer.getDealerId());
+        result.put("dealerName", savedDealer.getDealerName());
+        result.put("address", savedDealer.getAddress());
+        result.put("phone", savedDealer.getPhone());
+        result.put("contractStartDate", savedDealer.getContractStartDate());
+        result.put("salesQuota", savedDealer.getSalesQuota());
+        result.put("isActive", true);
+        
+        return result;
+    }
+    
+    // Update dealer
+    public Map<String, Object> updateDealer(Long dealerId, DealerRequest request) {
+        Dealer dealer = dealerRepository.findById(dealerId)
+                .orElseThrow(() -> new RuntimeException("Dealer not found with ID: " + dealerId));
+        
+        dealer.setDealerName(request.dealerName);
+        dealer.setAddress(request.address);
+        dealer.setPhone(request.phone);
+        
+        if (request.contractStartDate != null && !request.contractStartDate.isEmpty()) {
+            try {
+                dealer.setContractStartDate(LocalDate.parse(request.contractStartDate));
+            } catch (Exception e) {
+                // Ignore parse error
+            }
+        }
+        
+        if (request.salesQuota != null) {
+            dealer.setSalesQuota(BigDecimal.valueOf(request.salesQuota));
+        }
+        
+        Dealer savedDealer = dealerRepository.save(dealer);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("dealerId", savedDealer.getDealerId());
+        result.put("dealerName", savedDealer.getDealerName());
+        result.put("address", savedDealer.getAddress());
+        result.put("phone", savedDealer.getPhone());
+        result.put("contractStartDate", savedDealer.getContractStartDate());
+        result.put("salesQuota", savedDealer.getSalesQuota());
+        result.put("isActive", true);
+        
+        return result;
+    }
+    
+    // Delete dealer
+    public void deleteDealer(Long dealerId) {
+        if (!dealerRepository.existsById(dealerId)) {
+            throw new RuntimeException("Dealer not found with ID: " + dealerId);
+        }
+        dealerRepository.deleteById(dealerId);
     }
 
     public void createDealerContract(Long dealerId, String contractName, String startDate, String endDate) {

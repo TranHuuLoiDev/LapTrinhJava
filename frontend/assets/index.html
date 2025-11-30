@@ -200,64 +200,6 @@
         <div id="vehiclespec-list" class="list-container">Đang tải dữ liệu...</div>
       </section>
 
-      <!-- Customer Financing -->
-      <section id="financing" class="page">
-        <h2>Quản lý tài chính khách hàng</h2>
-        
-        <div class="form" id="financing-form">
-          <input type="hidden" id="fin-id" />
-          <input type="number" id="fin-customer-id" placeholder="ID Khách hàng" required />
-          <input type="number" id="fin-order-id" placeholder="ID Đơn hàng" required />
-          <input type="text" id="fin-bank" placeholder="Tên ngân hàng" required />
-          <input type="number" id="fin-loan-amount" placeholder="Số tiền vay" required onchange="calculateMonthlyPayment()" />
-          <input type="number" step="0.01" id="fin-interest" placeholder="Lãi suất (%/năm)" required onchange="calculateMonthlyPayment()" />
-          <input type="number" id="fin-term" placeholder="Kỳ hạn (tháng)" required onchange="calculateMonthlyPayment()" />
-          <input type="number" id="fin-down" placeholder="Tiền trả trước" onchange="calculateMonthlyPayment()" />
-          <input type="number" id="fin-monthly" placeholder="Trả hàng tháng" readonly />
-          <select id="fin-status">
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Disbursed">Disbursed</option>
-          </select>
-          <input type="date" id="fin-approved-date" placeholder="Ngày phê duyệt" />
-          <button type="button" onclick="saveFinancing()">Lưu</button>
-          <button type="button" onclick="resetFinancingForm()">Hủy</button>
-        </div>
-
-        <div id="financing-list" class="list-container">Đang tải dữ liệu...</div>
-      </section>
-
-      <!-- Customer Interactions -->
-      <section id="interactions" class="page">
-        <h2>Lịch sử tương tác khách hàng</h2>
-        
-        <div class="form" id="interactions-form">
-          <input type="hidden" id="int-id" />
-          <input type="number" id="int-customer-id" placeholder="ID Khách hàng" required />
-          <select id="int-type">
-            <option value="Call">Cuộc gọi</option>
-            <option value="Email">Email</option>
-            <option value="Meeting">Gặp mặt</option>
-            <option value="SMS">SMS</option>
-            <option value="Other">Khác</option>
-          </select>
-          <input type="text" id="int-subject" placeholder="Chủ đề" required />
-          <textarea id="int-notes" placeholder="Nội dung chi tiết" rows="3"></textarea>
-          <input type="datetime-local" id="int-date" required />
-          <input type="datetime-local" id="int-followup" placeholder="Lịch follow-up" />
-          <select id="int-status">
-            <option value="Pending">Pending</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-          <button type="button" onclick="saveInteraction()">Lưu</button>
-          <button type="button" onclick="resetInteractionForm()">Hủy</button>
-        </div>
-
-        <div id="interactions-list" class="list-container">Đang tải dữ liệu...</div>
-      </section>
-
       <!-- Inventory Transactions -->
       <section id="inventorytransactions" class="page">
         <h2>Lịch sử giao dịch kho</h2>
@@ -342,8 +284,6 @@
     import { loadTestDrives, saveTestDrive, resetForm, editTestDrive, deleteTestDrive } from './js/testdrives.js';
     import { loadFeedbacks } from './js/feedbacks.js';
     import { loadVehicleSpecs, saveVehicleSpec, editVehicleSpec, deleteVehicleSpec, resetVehicleSpecForm } from './js/vehiclespecs.js';
-    import { loadFinancing, saveFinancing, editFinancing, deleteFinancing, resetFinancingForm, calculateMonthlyPayment } from './js/financing.js';
-    import { loadInteractions, saveInteraction, editInteraction, deleteInteraction, resetInteractionForm } from './js/interactions.js';
     import { loadInventoryTransactions, saveInventoryTransaction, resetInventoryTransactionForm, filterTransactions, viewTransaction } from './js/inventorytransactions.js';
     import { loadDealerPayments, saveDealerPayment, editDealerPayment, deleteDealerPayment, resetDealerPaymentForm } from './js/dealerpayments.js';
 
@@ -394,8 +334,6 @@
             loadFeedbacks();
             loadTestDrives();
             loadVehicleSpecs();
-            loadFinancing();
-            loadInteractions();
             loadInventoryTransactions();
             loadDealerPayments();
         } catch (error) {
@@ -431,19 +369,6 @@
     window.editVehicleSpec = editVehicleSpec;
     window.deleteVehicleSpec = deleteVehicleSpec;
     window.resetVehicleSpecForm = resetVehicleSpecForm;
-
-    // Financing
-    window.saveFinancing = saveFinancing;
-    window.editFinancing = editFinancing;
-    window.deleteFinancing = deleteFinancing;
-    window.resetFinancingForm = resetFinancingForm;
-    window.calculateMonthlyPayment = calculateMonthlyPayment;
-
-    // Interactions
-    window.saveInteraction = saveInteraction;
-    window.editInteraction = editInteraction;
-    window.deleteInteraction = deleteInteraction;
-    window.resetInteractionForm = resetInteractionForm;
 
     // Inventory Transactions
     window.saveInventoryTransaction = saveInventoryTransaction;

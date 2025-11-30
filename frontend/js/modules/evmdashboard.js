@@ -5,6 +5,52 @@ let salesChart = null;
 let inventoryChart = null;
 let performanceChart = null;
 
+// Main init function for dashboard.html compatibility
+export async function init(container, user, role) {
+    console.log('🔷 Initializing EVM Dashboard Module...');
+    
+    // Create EVM dashboard layout
+    const dashboardHTML = `
+        <div class="cards">
+            <div class="card">
+                <h3>📦 Tổng số xe</h3>
+                <p class="stat-number" id="evm-total-vehicles">0</p>
+            </div>
+            <div class="card">
+                <h3>🏢 Số đại lý</h3>
+                <p class="stat-number" id="evm-total-dealers">0</p>
+            </div>
+            <div class="card">
+                <h3>👥 Khách hàng</h3>
+                <p class="stat-number" id="evm-total-customers">0</p>
+            </div>
+            <div class="card">
+                <h3>📋 Đơn hàng</h3>
+                <p class="stat-number" id="evm-total-orders">0</p>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-top: 30px;">
+            <div class="chart-container">
+                <h3>📈 Doanh số theo tháng (EVM)</h3>
+                <canvas id="evm-sales-chart" height="250"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>📊 Tổng quan kho hàng</h3>
+                <canvas id="evm-inventory-chart" height="250"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>🏆 Top 5 đại lý</h3>
+                <canvas id="evm-performance-chart" height="250"></canvas>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = dashboardHTML;
+    
+    // Load data
+    await initEvmDashboard();
+}
+
 export async function initEvmDashboard() {
     console.log(' Initializing EVM Dashboard...');
     
@@ -33,18 +79,36 @@ export async function initEvmDashboard() {
 
 async function loadDashboardStats() {
     try {
-        const stats = await fetchJson(`${urls.base}/evm/reports/stats`);
+        // Thêm timeout 10 giây cho API call
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         
-        document.getElementById('evm-total-vehicles').textContent = stats.totalVehicles || 0;
-        document.getElementById('evm-total-dealers').textContent = stats.totalDealers || 0;
-        document.getElementById('evm-total-customers').textContent = stats.totalCustomers || 0;
-        document.getElementById('evm-total-orders').textContent = stats.totalOrders || 0;
-        document.getElementById('evm-total-revenue').textContent = formatCurrency(stats.totalRevenue || 0);
-        document.getElementById('evm-total-inventory').textContent = stats.totalInventory || 0;
-        document.getElementById('evm-completed-orders').textContent = stats.completedOrders || 0;
+        const response = await fetch(`${urls.base}/evm/reports/stats`, {
+            credentials: 'include',
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const stats = await response.json();
+        
+        // Chỉ cập nhật các element tồn tại trong HTML (4 cards)
+        const vehiclesEl = document.getElementById('evm-total-vehicles');
+        const dealersEl = document.getElementById('evm-total-dealers');
+        const customersEl = document.getElementById('evm-total-customers');
+        const ordersEl = document.getElementById('evm-total-orders');
+        
+        if (vehiclesEl) vehiclesEl.textContent = stats.totalVehicles || 0;
+        if (dealersEl) dealersEl.textContent = stats.totalDealers || 0;
+        if (customersEl) customersEl.textContent = stats.totalCustomers || 0;
+        if (ordersEl) ordersEl.textContent = stats.totalOrders || 0;
     } catch (error) {
-        console.error('Error loading dashboard stats:', error);
-        alert('Failed to load dashboard statistics');
+        console.error('❌ Error loading dashboard stats:', error);
+        // Hiển thị 0 thay vì alert
+        document.getElementById('evm-total-vehicles').textContent = '0';
+        document.getElementById('evm-total-dealers').textContent = '0';
+        document.getElementById('evm-total-customers').textContent = '0';
+        document.getElementById('evm-total-orders').textContent = '0';
     }
 }
 
@@ -58,7 +122,16 @@ async function loadCharts() {
 
 async function loadMonthlySalesChart() {
     try {
-        const monthlySales = await fetchJson(`${urls.base}/evm/reports/monthly-sales`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(`${urls.base}/evm/reports/monthly-sales`, {
+            credentials: 'include',
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const monthlySales = await response.json();
         
         const labels = monthlySales.map(item => item.month);
         // Chuyển đổi sang tỷ đồng để hiển thị gọn hơn
@@ -119,9 +192,18 @@ async function loadMonthlySalesChart() {
 
 async function loadInventoryChart() {
     try {
-        console.log(' Loading inventory chart...');
-        const inventorySummary = await fetchJson(`${urls.base}/evm/reports/inventory-summary`);
-        console.log(' Inventory data:', inventorySummary);
+        console.log('📊 Loading inventory chart...');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(`${urls.base}/evm/reports/inventory-summary`, {
+            credentials: 'include',
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const inventorySummary = await response.json();
+        console.log('📦 Inventory data:', inventorySummary);
         
         const ctx = document.getElementById('evm-inventory-chart').getContext('2d');
         
@@ -164,7 +246,16 @@ async function loadInventoryChart() {
 
 async function loadDealerPerformanceChart() {
     try {
-        const performance = await fetchJson(`${urls.base}/evm/reports/dealer-performance`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(`${urls.base}/evm/reports/dealer-performance`, {
+            credentials: 'include',
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const performance = await response.json();
         
         const topDealers = performance.slice(0, 5);
         const labels = topDealers.map(d => d.dealerName);

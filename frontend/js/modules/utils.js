@@ -59,14 +59,14 @@ export function showPage(id) {
     
     if (id === 'financing') {
         import('./financing.js').then(module => {
-            module.loadFinancing();
-        });
+            module.init();
+        }).catch(err => console.error('Error loading financing module:', err));
     }
     
     if (id === 'interactions') {
         import('./interactions.js').then(module => {
-            module.loadInteractions();
-        });
+            module.init();
+        }).catch(err => console.error('Error loading interactions module:', err));
     }
     
     if (id === 'vehiclespecs') {
@@ -86,4 +86,69 @@ export function showPage(id) {
             module.loadDealerPayments();
         });
     }
+}
+
+// =====================
+// Notification System
+// =====================
+export function showNotification(message, type = 'info') {
+    // Xóa notification cũ nếu có
+    const oldNotification = document.querySelector('.notification-toast');
+    if (oldNotification) {
+        oldNotification.remove();
+    }
+
+    // Tạo notification mới
+    const notification = document.createElement('div');
+    notification.className = 'notification-toast';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        max-width: 400px;
+        font-weight: 600;
+        animation: slideInRight 0.3s ease-out;
+    `;
+
+    // Màu sắc theo loại
+    const colors = {
+        success: { bg: '#4caf50', color: 'white' },
+        error: { bg: '#f44336', color: 'white' },
+        warning: { bg: '#ff9800', color: 'white' },
+        info: { bg: '#2196f3', color: 'white' }
+    };
+
+    const style = colors[type] || colors.info;
+    notification.style.background = style.bg;
+    notification.style.color = style.color;
+    notification.textContent = message;
+
+    // Thêm animation CSS nếu chưa có
+    if (!document.getElementById('notification-styles')) {
+        const styleSheet = document.createElement('style');
+        styleSheet.id = 'notification-styles';
+        styleSheet.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    }
+
+    document.body.appendChild(notification);
+
+    // Tự động ẩn sau 3 giây
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }

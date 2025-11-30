@@ -1,16 +1,24 @@
 package com.evdms.evm.controller;
 
-import com.evdms.evm.service.DealerManagementService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.evdms.evm.service.DealerManagementService;
+
 @RestController
-@RequestMapping("/api/evm/dealers")
+@RequestMapping("/api/dealers")
 public class DealerManagementController {
 
     private final DealerManagementService dealerManagementService;
@@ -18,6 +26,57 @@ public class DealerManagementController {
     public DealerManagementController(DealerManagementService dealerManagementService) {
         this.dealerManagementService = dealerManagementService;
     }
+    
+    // GET all dealers
+    @GetMapping
+    public ResponseEntity<?> getAllDealers() {
+        try {
+            List<Map<String, Object>> dealers = dealerManagementService.getAllDealers();
+            return ResponseEntity.ok(dealers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Failed to load dealers", e.getMessage()));
+        }
+    }
+    
+    // CREATE new dealer
+    @PostMapping
+    public ResponseEntity<?> createDealer(@RequestBody DealerRequest request) {
+        try {
+            Map<String, Object> newDealer = dealerManagementService.createDealer(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newDealer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Failed to create dealer", e.getMessage()));
+        }
+    }
+    
+    // UPDATE dealer
+    @PutMapping("/{dealerId}")
+    public ResponseEntity<?> updateDealer(@PathVariable Long dealerId, @RequestBody DealerRequest request) {
+        try {
+            Map<String, Object> updatedDealer = dealerManagementService.updateDealer(dealerId, request);
+            return ResponseEntity.ok(updatedDealer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Failed to update dealer", e.getMessage()));
+        }
+    }
+    
+    // DELETE dealer
+    @DeleteMapping("/{dealerId}")
+    public ResponseEntity<?> deleteDealer(@PathVariable Long dealerId) {
+        try {
+            dealerManagementService.deleteDealer(dealerId);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Dealer deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Failed to delete dealer", e.getMessage()));
+        }
+    }
+    
     @PostMapping("/{dealerId}/contract")
     public ResponseEntity<?> createDealerContract(@PathVariable Long dealerId, @RequestBody ContractRequest request) {
         try {
@@ -153,6 +212,15 @@ public class DealerManagementController {
     public static class PaymentRequest {
         public Double paymentAmount;
         public String paymentMethod;
+    }
+    
+    public static class DealerRequest {
+        public String dealerName;
+        public String address;
+        public String phone;
+        public String contractStartDate;
+        public Double salesQuota;
+        public Boolean isActive;
     }
 
     public static class ErrorResponse {

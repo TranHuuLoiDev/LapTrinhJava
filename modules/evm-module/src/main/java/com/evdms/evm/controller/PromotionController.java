@@ -1,12 +1,14 @@
 package com.evdms.evm.controller;
 
 import com.evdms.evm.model.Promotion;
+import com.evdms.evm.dto.PromotionDTO;
 import com.evdms.evm.service.PromotionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/evm/promotions")
@@ -18,9 +20,12 @@ public class PromotionController {
         this.promotionService = promotionService;
     }
     @GetMapping
-    public ResponseEntity<List<Promotion>> getAllPromotions() {
+    public ResponseEntity<List<PromotionDTO>> getAllPromotions() {
         List<Promotion> promotions = promotionService.getAllPromotions();
-        return ResponseEntity.ok(promotions);
+        List<PromotionDTO> dtos = promotions.stream()
+                .map(PromotionDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> getPromotionById(@PathVariable Long id) {
@@ -33,14 +38,20 @@ public class PromotionController {
         }
     }
     @GetMapping("/active/list")
-    public ResponseEntity<List<Promotion>> getActivePromotions() {
+    public ResponseEntity<List<PromotionDTO>> getActivePromotions() {
         List<Promotion> promotions = promotionService.getActivePromotions();
-        return ResponseEntity.ok(promotions);
+        List<PromotionDTO> dtos = promotions.stream()
+                .map(PromotionDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
     @GetMapping("/effective/list")
-    public ResponseEntity<List<Promotion>> getEffectivePromotions() {
+    public ResponseEntity<List<PromotionDTO>> getEffectivePromotions() {
         List<Promotion> promotions = promotionService.getEffectivePromotions();
-        return ResponseEntity.ok(promotions);
+        List<PromotionDTO> dtos = promotions.stream()
+                .map(PromotionDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
     @GetMapping("/search")
     public ResponseEntity<List<Promotion>> searchPromotions(@RequestParam String name) {

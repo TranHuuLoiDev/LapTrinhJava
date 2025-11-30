@@ -1,283 +1,599 @@
-CREATE DATABASE ev_dealer_management_db;
-USE ev_dealer_management_db;
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Máy chủ: 127.0.0.1
+-- Thời gian đã tạo: Th10 30, 2025 lúc 09:33 AM
+-- Phiên bản máy phục vụ: 10.4.32-MariaDB
+-- Phiên bản PHP: 8.0.30
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
 
--- Vô hiệu hóa kiểm tra khóa ngoại tạm thời
-SET FOREIGN_KEY_CHECKS = 0;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- 1. Bảng Dealers
-CREATE TABLE IF NOT EXISTS Dealers (
-    dealer_id INT AUTO_INCREMENT PRIMARY KEY,
-    dealer_name VARCHAR(100) NOT NULL,
-    address VARCHAR(255),
-    phone VARCHAR(20),
-    contract_start_date DATE,
-    sales_quota DECIMAL(15, 2) DEFAULT 0.00
-);
-Error Code: 1046. No database selected Select the default DB to be used by double-clicking its name in the SCHEMAS list in the sidebar.
+--
+-- Cơ sở dữ liệu: `ev_dealer_management_db`
+--
 
--- 2. Bảng Users
-CREATE TABLE IF NOT EXISTS Users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
-    role ENUM('Admin', 'EVM Staff', 'Dealer Manager', 'Dealer Staff') NOT NULL,
-    dealer_id INT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (dealer_id) REFERENCES Dealers(dealer_id)
-);
+-- --------------------------------------------------------
 
--- 3. Bảng Vehicles
-CREATE TABLE IF NOT EXISTS Vehicles (
-    vehicle_id INT AUTO_INCREMENT PRIMARY KEY,
-    model_name VARCHAR(100) NOT NULL,
-    version VARCHAR(50) NOT NULL,
-    color VARCHAR(30) NOT NULL,
-    base_price DECIMAL(15, 2) NOT NULL,
-    retail_price DECIMAL(15, 2) NOT NULL,
-    description TEXT,
-    UNIQUE KEY uk_vehicle_version_color (`model_name`, `version`, `color`)
-);
+--
+-- Cấu trúc bảng cho bảng `customers`
+--
 
--- 4. Bảng Inventory
-CREATE TABLE IF NOT EXISTS Inventory (
-    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_id INT NOT NULL,
-    dealer_id INT NULL,
-    quantity INT NOT NULL DEFAULT 0,
-    vin_number VARCHAR(17) UNIQUE NULL,
-    location ENUM('EVM_HQ', 'Dealer_Lot', 'In_Transit') NOT NULL,
-    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),
-    FOREIGN KEY (dealer_id) REFERENCES Dealers(dealer_id)
-);
+CREATE TABLE `customers` (
+  `customer_id` int(11) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 5. Bảng Customers
-CREATE TABLE IF NOT EXISTS Customers (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    full_name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20) UNIQUE,
-    email VARCHAR(100) UNIQUE,
-    address VARCHAR(255),
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+--
+-- Đang đổ dữ liệu cho bảng `customers`
+--
 
--- 6. Bảng SalesOrders
-CREATE TABLE IF NOT EXISTS SalesOrders (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    customer_id INT NOT NULL,
-    dealer_id INT NOT NULL,
-    salesperson_id INT NOT NULL,
-    total_amount DECIMAL(15, 2) NOT NULL,
-    status ENUM('Quotation', 'Pending', 'Confirmed', 'Delivered', 'Cancelled') NOT NULL,
-    payment_method ENUM('Cash', 'Installment') NOT NULL,
-    delivery_date_expected DATE,
-    delivery_date_actual DATE NULL,
-    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
-    FOREIGN KEY (dealer_id) REFERENCES Dealers(dealer_id),
-    FOREIGN KEY (salesperson_id) REFERENCES Users(user_id)
-);
+INSERT INTO `customers` (`customer_id`, `full_name`, `phone`, `email`, `address`, `date_created`) VALUES
+(1, 'Phạm Minh Đức', '0911111111', 'pmd@gmail.com', '10 Hoàng Hoa Thám, Ba Đình, Hà Nội', '2025-11-27 08:47:39'),
+(2, 'Hoàng Thị Mai', '0922222222', 'htm@gmail.com', '20 Lê Duẩn, Quận 1, TP.HCM', '2025-11-27 08:47:39'),
+(3, 'Võ Văn Nam', '0933333333', 'vvn@gmail.com', '30 Trần Phú, Hải Châu, Đà Nẵng', '2025-11-27 08:47:39'),
+(4, 'Ngô Thị Lan', '0944444444', 'ntl@gmail.com', '40 Nguyễn Trãi, Thanh Xuân, Hà Nội', '2025-11-27 08:47:39'),
+(5, 'Đặng Văn Hùng', '0955555555', 'dvh@gmail.com', '50 Điện Biên Phủ, Quận 3, TP.HCM', '2025-11-27 08:47:39');
 
--- 7. Bảng OrderItems
-CREATE TABLE IF NOT EXISTS OrderItems (
-    order_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    vehicle_id INT NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    unit_price DECIMAL(15, 2) NOT NULL,
-    discount_amount DECIMAL(15, 2) DEFAULT 0.00,
-    FOREIGN KEY (order_id) REFERENCES SalesOrders(order_id),
-    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id)
-);
+-- --------------------------------------------------------
 
--- 8. Bảng DealerPayables
-CREATE TABLE IF NOT EXISTS DealerPayables (
-    payable_id INT AUTO_INCREMENT PRIMARY KEY,
-    dealer_id INT NOT NULL,
-    invoice_number VARCHAR(50) UNIQUE,
-    amount_due DECIMAL(15, 2) NOT NULL,
-    due_date DATE NOT NULL,
-    status ENUM('Pending', 'Paid', 'Overdue') NOT NULL,
-    FOREIGN KEY (dealer_id) REFERENCES Dealers(dealer_id)
-);
-USE ev_dealer_management_db;
+--
+-- Cấu trúc bảng cho bảng `dealerpayables`
+--
 
--- Vô hiệu hóa kiểm tra khóa ngoại tạm thời
-SET FOREIGN_KEY_CHECKS = 0;
+CREATE TABLE `dealerpayables` (
+  `payable_id` int(11) NOT NULL,
+  `dealer_id` int(11) NOT NULL,
+  `invoice_number` varchar(50) DEFAULT NULL,
+  `amount_due` decimal(15,2) NOT NULL,
+  `due_date` date NOT NULL,
+  `status` enum('Pending','Paid','Overdue') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- =======================================================
--- A. TẠO BẢNG MỚI CHO MODULE KHÁCH HÀNG
--- =======================================================
+--
+-- Đang đổ dữ liệu cho bảng `dealerpayables`
+--
 
--- 9. Bảng TestDrives (Lịch Lái Thử)
-CREATE TABLE IF NOT EXISTS TestDrives (
-    test_drive_id INT AUTO_INCREMENT PRIMARY KEY,
-    
-    customer_id INT NOT NULL,
-    vehicle_id INT NOT NULL, -- Xe muốn lái thử
-    dealer_id INT,          -- Đại lý thực hiện
-    
-    preferred_date DATE NOT NULL,
-    preferred_time TIME NOT NULL,
-    
-    -- Trạng thái: Pending, Confirmed, Completed, Cancelled
-    status VARCHAR(50) NOT NULL DEFAULT 'Pending', 
-    note TEXT,
-    
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
-    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),
-    FOREIGN KEY (dealer_id) REFERENCES Dealers(dealer_id)
-);
+INSERT INTO `dealerpayables` (`payable_id`, `dealer_id`, `invoice_number`, `amount_due`, `due_date`, `status`) VALUES
+(1, 1, 'INV-2024-001', 2400000000.00, '2024-12-01', 'Pending'),
+(2, 2, 'INV-2024-002', 4500000000.00, '2024-12-05', 'Pending'),
+(3, 3, 'INV-2024-003', 850000000.00, '2024-12-10', 'Paid'),
+(4, 1, 'INV-2024-004', 690000000.00, '2024-12-15', 'Pending');
 
--- 10. Bảng Feedbacks (Phản hồi/Góp ý)
-CREATE TABLE IF NOT EXISTS Feedbacks (
-    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
-    
-    customer_id INT NOT NULL,
-    
-    -- Loại phản hồi: Service, Vehicle, Dealer, General
-    feedback_type VARCHAR(50), 
-    subject VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    rating TINYINT CHECK (rating BETWEEN 1 AND 5), -- Đánh giá từ 1 đến 5 sao
-    
-    submission_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    -- Trạng thái xử lý: New, In Progress, Resolved
-    status VARCHAR(50) DEFAULT 'New',
-    
-    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
-);
+-- --------------------------------------------------------
 
--- Bảng Customers trong file gốc đã thiếu user_id, 
--- để đảm bảo tính toàn vẹn, ta bỏ qua trường user_id trong Customers ở đây.
+--
+-- Cấu trúc bảng cho bảng `dealers`
+--
 
--- Bật lại kiểm tra khóa ngoại
-SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `dealers` (
+  `dealer_id` int(11) NOT NULL,
+  `dealer_name` varchar(100) NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `contract_start_date` date DEFAULT NULL,
+  `sales_quota` decimal(15,2) DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- =======================================================
--- B. CHÈN DỮ LIỆU MẪU CHO MODULE KHÁCH HÀNG
--- =======================================================
+--
+-- Đang đổ dữ liệu cho bảng `dealers`
+--
 
--- Dữ liệu mẫu cho bảng TestDrives (customer_id 1 và 2 đã có)
--- Giả định: vehicle_id=2 (VF e34), vehicle_id=1 (VF 5)
--- Giả định: dealer_id=1 (Miền Bắc), dealer_id=2 (Miền Nam)
-INSERT INTO TestDrives (customer_id, vehicle_id, dealer_id, preferred_date, preferred_time, status, note) VALUES
-(1, 2, 1, '2025-12-01', '10:00:00', 'Confirmed', 'Khách hàng muốn lái thử VF e34 tại HN.'),
-(2, 1, 2, '2025-12-05', '15:30:00', 'Pending', 'Xin dời lịch nếu có thể.'),
-(1, 3, 1, '2025-12-10', '14:00:00', 'Pending', NULL); -- Thêm 1 lịch nữa cho customer 1
+INSERT INTO `dealers` (`dealer_id`, `dealer_name`, `address`, `phone`, `contract_start_date`, `sales_quota`) VALUES
+(1, 'Đại lý VinFast Hà Nội', '123 Đường Láng, Đống Đa, Hà Nội', '024-3333-4444', '2024-01-01', 5000000000.00),
+(2, 'Đại lý VinFast TP.HCM', '456 Lê Lợi, Quận 1, TP.HCM', '028-3888-9999', '2024-01-01', 8000000000.00),
+(3, 'Đại lý VinFast Đà Nẵng', '789 Nguyễn Văn Linh, Đà Nẵng', '0236-3777-8888', '2024-02-01', 3000000000.00);
 
+-- --------------------------------------------------------
 
--- Dữ liệu mẫu cho bảng Feedbacks
-INSERT INTO Feedbacks (customer_id, feedback_type, subject, content, rating, status) VALUES
-(1, 'Vehicle', 'Chất lượng VF 8', 'Tôi rất hài lòng với trải nghiệm lái VF 8, rất êm và mạnh.', 5, 'New'),
-(2, 'Dealer', 'Dịch vụ tại Đại lý Miền Nam', 'Nhân viên tư vấn nhiệt tình, nhưng quá trình chờ đợi hơi lâu.', 4, 'In Progress'),
-(1, 'Service', 'Góp ý ứng dụng di động', 'Ứng dụng mobile cần cải thiện tính năng đặt lịch bảo dưỡng.', 3, 'New');
+--
+-- Cấu trúc bảng cho bảng `feedbacks`
+--
 
--- =======================================================
--- C. TRUY VẤN BÁO CÁO MẪU MỚI (Về Khách hàng)
--- =======================================================
+CREATE TABLE `feedbacks` (
+  `feedback_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `feedback_type` varchar(50) DEFAULT NULL,
+  `subject` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `rating` tinyint(4) DEFAULT NULL CHECK (`rating` between 1 and 5),
+  `submission_date` datetime DEFAULT current_timestamp(),
+  `status` varchar(50) DEFAULT 'New',
+  `handled_by` int(11) DEFAULT NULL,
+  `handled_date` datetime DEFAULT NULL,
+  `resolution_notes` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Truy vấn 1: Thống kê số lượng Lịch Lái Thử theo trạng thái
-SELECT
-    status AS Trang_Thai_Lai_Thu,
-    COUNT(test_drive_id) AS So_Luong
-FROM
-    TestDrives
-GROUP BY
-    status;
+--
+-- Đang đổ dữ liệu cho bảng `feedbacks`
+--
 
--- Truy vấn 2: Xem chi tiết Phản hồi của Khách hàng
-SELECT
-    C.full_name AS Ten_Khach_Hang,
-    F.submission_date AS Ngay_Gui,
-    F.feedback_type AS Loai_Phan_Hoi,
-    F.subject AS Tieu_De,
-    F.rating AS Danh_Gia_Sao,
-    F.status AS Trang_Thai_Xu_Ly
-FROM
-    Feedbacks F
-INNER JOIN
-    Customers C ON F.customer_id = C.customer_id
-ORDER BY
-    Ngay_Gui DESC;
+INSERT INTO `feedbacks` (`feedback_id`, `customer_id`, `feedback_type`, `subject`, `content`, `rating`, `submission_date`, `status`, `handled_by`, `handled_date`, `resolution_notes`) VALUES
+(1, 1, 'Service', 'Đánh giá dịch vụ', 'Dịch vụ tuyệt vời, nhân viên nhiệt tình!', 5, '2025-11-27 15:47:39', 'New', NULL, NULL, NULL),
+(2, 2, 'Vehicle', 'Góp ý về xe VF9', 'Xe đẹp, giá hơi cao. Mong có thêm khuyến mãi.', 4, '2025-11-27 15:47:39', 'New', NULL, NULL, NULL),
+(3, 3, 'Service', 'Thời gian chờ', 'Thời gian chờ lái thử hơi lâu.', 3, '2025-11-27 15:47:39', 'New', NULL, NULL, NULL),
+(4, 4, 'Dealer', 'Đánh giá tư vấn viên', 'Rất hài lòng với tư vấn viên!', 5, '2025-11-27 15:47:39', 'New', NULL, NULL, NULL);
 
--- Bật lại kiểm tra khóa ngoại
-SET FOREIGN_KEY_CHECKS = 1;
+-- --------------------------------------------------------
 
--- B. DỮ LIỆU MẪU (SEED DATA)
+--
+-- Cấu trúc bảng cho bảng `inventory`
+--
 
--- 1. Dealers
-INSERT INTO Dealers (`dealer_name`, `address`, `phone`, `contract_start_date`, `sales_quota`) VALUES
-('Đại lý Miền Bắc - HN', 'Hà Nội', '0912345678', '2023-01-15', 50.00),
-('Đại lý Miền Nam - HCM', 'TP. Hồ Chí Minh', '0987654321', '2023-02-20', 75.00);
+CREATE TABLE `inventory` (
+  `inventory_id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `dealer_id` int(11) DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 0,
+  `vin_number` varchar(17) DEFAULT NULL,
+  `location` enum('EVM_HQ','Dealer_Lot','In_Transit') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 2. Users 
-INSERT INTO `Users` (`username`, `password_hash`, `full_name`, `role`, `dealer_id`) VALUES
-('admin', 'admin_hash', 'Nguyễn Văn A', 'Admin', NULL),
-('evm_staff', 'evm_hash', 'Trần Thị B', 'EVM Staff', NULL),
-('d1_manager', 'd1m_hash', 'Lê Văn C', 'Dealer Manager', 1),
-('sales_hn_01', 'sales1_hash', 'Phạm Thu D', 'Dealer Staff', 1),
-('sales_hcm_02', 'sales2_hash', 'Hoàng Văn E', 'Dealer Staff', 2);
+--
+-- Đang đổ dữ liệu cho bảng `inventory`
+--
 
--- 3. Vehicles
-INSERT INTO `Vehicles` (`model_name`, `version`, `color`, `base_price`, `retail_price`, `description`) VALUES
-('VF 5', 'Plus', 'Trắng', 450000000.00, 500000000.00, 'Xe điện cỡ nhỏ'),
-('VF e34', 'Plus', 'Đỏ', 600000000.00, 700000000.00, 'Xe điện SUV tầm trung'),
-('VF 8', 'Eco', 'Đen', 1000000000.00, 1100000000.00, 'Xe điện SUV cỡ lớn');
+INSERT INTO `inventory` (`inventory_id`, `vehicle_id`, `dealer_id`, `quantity`, `vin_number`, `location`) VALUES
+(1, 1, 1, 15, NULL, 'Dealer_Lot'),
+(2, 2, 1, 8, NULL, 'Dealer_Lot'),
+(3, 3, 1, 20, NULL, 'Dealer_Lot'),
+(4, 1, 2, 25, NULL, 'Dealer_Lot'),
+(5, 2, 2, 12, NULL, 'Dealer_Lot'),
+(6, 4, 2, 5, NULL, 'Dealer_Lot'),
+(7, 5, 3, 10, NULL, 'Dealer_Lot');
 
--- 4. Customers
-INSERT INTO `Customers` (`full_name`, `phone`, `email`, `address`) VALUES
-('Nguyễn Văn Khách', '0901112223', 'khachnv@mail.com', 'Quận 1, TP.HCM'),
-('Trần Thị Hàng', '0904445556', 'hangtt@mail.com', 'Đống Đa, Hà Nội');
+-- --------------------------------------------------------
 
--- 5. SalesOrders (Đơn hàng mẫu)
-INSERT INTO `SalesOrders` (`customer_id`, `dealer_id`, `salesperson_id`, `total_amount`, `status`, `payment_method`, `delivery_date_actual`) VALUES
-(2, 1, 4, 700000000.00, 'Delivered', 'Cash', '2025-10-20');
-INSERT INTO `SalesOrders` (`customer_id`, `dealer_id`, `salesperson_id`, `total_amount`, `status`, `payment_method`, `delivery_date_expected`) VALUES
-(1, 2, 5, 1100000000.00, 'Confirmed', 'Installment', '2025-11-15');
-INSERT INTO `SalesOrders` (`customer_id`, `dealer_id`, `salesperson_id`, `total_amount`, `status`, `payment_method`, `delivery_date_actual`) VALUES
-(1, 2, 5, 500000000.00, 'Delivered', 'Cash', '2025-09-01');
+--
+-- Cấu trúc bảng cho bảng `orderitems`
+--
 
--- 6. OrderItems
-INSERT INTO `OrderItems` (`order_id`, `vehicle_id`, `quantity`, `unit_price`, `discount_amount`) VALUES
-(1, 2, 1, 700000000.00, 0.00),
-(2, 3, 1, 1100000000.00, 0.00),
-(3, 1, 1, 500000000.00, 0.00);
+CREATE TABLE `orderitems` (
+  `order_item_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `unit_price` decimal(15,2) NOT NULL,
+  `discount_amount` decimal(15,2) DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 7. Inventory (Tồn kho)
-INSERT INTO `Inventory` (`vehicle_id`, `dealer_id`, `quantity`, `location`) VALUES
-(1, NULL, 50, 'EVM_HQ'),
-(2, NULL, 40, 'EVM_HQ'),
-(3, 1, 5, 'Dealer_Lot'),
-(2, 2, 3, 'Dealer_Lot');
+--
+-- Đang đổ dữ liệu cho bảng `orderitems`
+--
 
--- 8. DealerPayables (Công nợ mẫu)
-INSERT INTO `DealerPayables` (`dealer_id`, `invoice_number`, `amount_due`, `due_date`, `status`) VALUES
-(1, 'INV20251001', 5000000000.00, '2025-11-30', 'Pending'),
-(2, 'INV20251002', 7500000000.00, '2025-11-20', 'Pending');
+INSERT INTO `orderitems` (`order_item_id`, `order_id`, `vehicle_id`, `quantity`, `unit_price`, `discount_amount`) VALUES
+(1, 1, 1, 1, 1200000000.00, 0.00),
+(2, 2, 2, 1, 1500000000.00, 0.00),
+(3, 3, 5, 1, 850000000.00, 0.00),
+(4, 4, 3, 1, 690000000.00, 0.00),
+(5, 5, 4, 1, 1800000000.00, 0.00);
 
--- C. TRUY VẤN BÁO CÁO MẪU
+-- --------------------------------------------------------
 
-SELECT
-    U.full_name AS Ten_Nhan_Vien_Ban_Hang,
-    D.dealer_name AS Dai_Ly,
-    COUNT(SO.order_id) AS Tong_Don_Hang_Da_Giao,
-    SUM(SO.total_amount) AS Tong_Doanh_So_VND,
-    SUM(OI.quantity) AS Tong_So_Xe_Ban_Duoc
-FROM
-    SalesOrders SO
-INNER JOIN
-    Users U ON SO.salesperson_id = U.user_id
-INNER JOIN
-    Dealers D ON SO.dealer_id = D.dealer_id
-INNER JOIN
-    OrderItems OI ON SO.order_id = OI.order_id
-WHERE
-    SO.status = 'Delivered'
-GROUP BY
-    U.user_id, U.full_name, D.dealer_name
-ORDER BY
-    Tong_Doanh_So_VND DESC;
+--
+-- Cấu trúc bảng cho bảng `quotations`
+--
+
+CREATE TABLE `quotations` (
+  `quotation_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `dealer_id` int(11) NOT NULL,
+  `staff_id` int(11) DEFAULT NULL,
+  `quoted_price` decimal(15,2) NOT NULL,
+  `discount_amount` decimal(15,2) DEFAULT 0.00,
+  `final_price` decimal(15,2) NOT NULL,
+  `quotation_date` date NOT NULL,
+  `valid_until` date NOT NULL,
+  `status` enum('Draft','Sent','Accepted','Rejected','Expired') DEFAULT 'Draft',
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `salescontracts`
+--
+
+CREATE TABLE `salescontracts` (
+  `contract_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `contract_number` varchar(50) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `dealer_id` int(11) NOT NULL,
+  `contract_date` date NOT NULL,
+  `delivery_date` date DEFAULT NULL,
+  `contract_value` decimal(15,2) NOT NULL,
+  `payment_terms` text DEFAULT NULL,
+  `warranty_terms` text DEFAULT NULL,
+  `status` enum('Draft','Active','Completed','Cancelled') DEFAULT 'Draft',
+  `signed_by_customer` tinyint(1) DEFAULT 0,
+  `signed_by_dealer` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `salesorders`
+--
+
+CREATE TABLE `salesorders` (
+  `order_id` int(11) NOT NULL,
+  `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `customer_id` int(11) NOT NULL,
+  `dealer_id` int(11) NOT NULL,
+  `salesperson_id` int(11) NOT NULL,
+  `total_amount` decimal(15,2) NOT NULL,
+  `status` enum('Quotation','Pending','Confirmed','Delivered','Cancelled') NOT NULL,
+  `payment_method` enum('Cash','Installment') NOT NULL,
+  `delivery_date_expected` date DEFAULT NULL,
+  `delivery_date_actual` date DEFAULT NULL,
+  `staff_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `salesorders`
+--
+
+INSERT INTO `salesorders` (`order_id`, `order_date`, `customer_id`, `dealer_id`, `salesperson_id`, `total_amount`, `status`, `payment_method`, `delivery_date_expected`, `delivery_date_actual`, `staff_id`) VALUES
+(1, '2024-10-14 17:00:00', 1, 1, 3, 1200000000.00, 'Delivered', 'Cash', '2024-11-01', NULL, NULL),
+(2, '2024-10-31 17:00:00', 2, 2, 4, 1500000000.00, 'Confirmed', 'Installment', '2024-12-01', NULL, NULL),
+(3, '2024-11-09 17:00:00', 3, 3, 4, 850000000.00, 'Pending', 'Cash', '2024-12-10', NULL, NULL),
+(4, '2024-11-14 17:00:00', 4, 1, 3, 690000000.00, 'Confirmed', 'Installment', '2024-12-15', NULL, NULL),
+(5, '2024-11-19 17:00:00', 5, 2, 4, 1800000000.00, 'Quotation', 'Cash', '2025-01-05', NULL, NULL),
+(12, '2025-02-24 17:00:00', 2, 1, 4, 533.00, 'Pending', 'Cash', '2025-12-25', '2025-12-20', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `testdrives`
+--
+
+CREATE TABLE `testdrives` (
+  `test_drive_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `dealer_id` int(11) DEFAULT NULL,
+  `preferred_date` date NOT NULL,
+  `preferred_time` time NOT NULL,
+  `status` varchar(50) NOT NULL DEFAULT 'Pending',
+  `note` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `testdrives`
+--
+
+INSERT INTO `testdrives` (`test_drive_id`, `customer_id`, `vehicle_id`, `dealer_id`, `preferred_date`, `preferred_time`, `status`, `note`, `created_at`) VALUES
+(1, 1, 1, NULL, '2024-10-10', '10:00:00', 'Completed', 'Khách hàng rất hài lòng với dịch ', NULL),
+(2, 2, 2, 2, '2024-10-28', '14:00:00', 'Completed', 'Đã đặt mua sau lái thử', '2025-11-27 15:47:39'),
+(3, 3, 5, 3, '2024-11-08', '09:00:00', 'Completed', 'Cần tư vấn thêm về trả góp', '2025-11-27 15:47:39'),
+(4, 4, 3, 1, '2024-11-12', '15:30:00', 'Confirmed', '', '2025-11-27 15:47:39');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `users`
+--
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
+  `role` enum('Admin','EVM Staff','Dealer Manager','Dealer Staff') NOT NULL,
+  `dealer_id` int(11) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `users`
+--
+
+INSERT INTO `users` (`user_id`, `username`, `password_hash`, `full_name`, `role`, `dealer_id`, `is_active`) VALUES
+(2, 'evmstaff1', '$2a$12$LQv3c1yqBW/PIe.LIbqEJOIX6sXp.L6U1LLIqN0r3Z4s1CnqKdPXe', 'Nguyễn Văn A', 'EVM Staff', NULL, 1),
+(3, 'dealer1manager', '$2a$12$LQv3c1yqBW/PIe.LIbqEJOIX6sXp.L6U1LLIqN0r3Z4s1CnqKdPXe', 'Trần Thị B', 'Dealer Manager', 1, 1),
+(4, 'dealer1staff', '$2a$12$LQv3c1yqBW/PIe.LIbqEJOIX6sXp.L6U1LLIqN0r3Z4s1CnqKdPXe', 'Lê Văn C', 'Dealer Staff', 1, 1),
+(8, 'admin', '$2a$12$rHQh3EGNVdLw4VLF0BEAEOdqNWz7LRN8mKFE0eqPvLRxLqC6qGhXC', 'Quản trị viên Hệ thống', 'Admin', NULL, 1),
+(9, 'evm_staff', '$2a$12$LQv3c1yqBW/PIe.LIbqEJOIX6sXp.L6U1LLIqN0r3Z4s1CnqKdPXe', 'Nhân viên Nhà máy EVM', 'EVM Staff', NULL, 1),
+(10, 'dealer_manager', '$2a$12$LQv3c1yqBW/PIe.LIbqEJOIX6sXp.L6U1LLIqN0r3Z4s1CnqKdPXe', 'Quản lý Đại lý', 'Dealer Manager', 1, 1),
+(11, 'dealer_staff', '$2a$12$LQv3c1yqBW/PIe.LIbqEJOIX6sXp.L6U1LLIqN0r3Z4s1CnqKdPXe', 'Nhân viên Đại lý', 'Dealer Staff', 1, 1),
+(12, 'test1', '$2a$10$ZKUXlIdmxzPLM0BaiRJYDu1M9xyxX0Wx9YViv544Z.lDvAcX1oL0S', 'Test User', 'Dealer Staff', NULL, 1),
+(13, 'adminn', '$2a$10$34PJRE9DRpVo2UR4Z2tKferru2bCxuzvKsMtW5Fi4sM4BgyNHXyWq', 'Admin', 'Admin', NULL, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `vehicles`
+--
+
+CREATE TABLE `vehicles` (
+  `vehicle_id` int(11) NOT NULL,
+  `model_name` varchar(100) NOT NULL,
+  `version` varchar(50) NOT NULL,
+  `color` varchar(30) NOT NULL,
+  `base_price` decimal(15,2) NOT NULL,
+  `retail_price` decimal(15,2) NOT NULL,
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `vehicles`
+--
+
+INSERT INTO `vehicles` (`vehicle_id`, `model_name`, `version`, `color`, `base_price`, `retail_price`, `description`) VALUES
+(1, 'VinFast VF8', 'Eco', 'Đen', 1100000000.00, 1200000000.00, 'SUV điện 5+2 chỗ'),
+(2, 'VinFast VF9', 'Plus', 'Trắng', 1400000000.00, 1500000000.00, 'SUV điện 7 chỗ cao cấp'),
+(3, 'VinFast VF e34', 'Standard', 'Xanh', 650000000.00, 690000000.00, 'SUV điện compact'),
+(4, 'Tesla Model 3', 'Long Range', 'Đỏ', 1700000000.00, 1800000000.00, 'Sedan điện cao cấp'),
+(5, 'BYD Atto 3', 'Extended', 'Xám', 800000000.00, 850000000.00, 'SUV điện giá tốt');
+
+--
+-- Chỉ mục cho các bảng đã đổ
+--
+
+--
+-- Chỉ mục cho bảng `customers`
+--
+ALTER TABLE `customers`
+  ADD PRIMARY KEY (`customer_id`),
+  ADD UNIQUE KEY `phone` (`phone`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Chỉ mục cho bảng `dealerpayables`
+--
+ALTER TABLE `dealerpayables`
+  ADD PRIMARY KEY (`payable_id`),
+  ADD UNIQUE KEY `invoice_number` (`invoice_number`),
+  ADD KEY `dealer_id` (`dealer_id`);
+
+--
+-- Chỉ mục cho bảng `dealers`
+--
+ALTER TABLE `dealers`
+  ADD PRIMARY KEY (`dealer_id`);
+
+--
+-- Chỉ mục cho bảng `feedbacks`
+--
+ALTER TABLE `feedbacks`
+  ADD PRIMARY KEY (`feedback_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `handled_by` (`handled_by`);
+
+--
+-- Chỉ mục cho bảng `inventory`
+--
+ALTER TABLE `inventory`
+  ADD PRIMARY KEY (`inventory_id`),
+  ADD UNIQUE KEY `vin_number` (`vin_number`),
+  ADD KEY `vehicle_id` (`vehicle_id`),
+  ADD KEY `dealer_id` (`dealer_id`);
+
+--
+-- Chỉ mục cho bảng `orderitems`
+--
+ALTER TABLE `orderitems`
+  ADD PRIMARY KEY (`order_item_id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `vehicle_id` (`vehicle_id`);
+
+--
+-- Chỉ mục cho bảng `quotations`
+--
+ALTER TABLE `quotations`
+  ADD PRIMARY KEY (`quotation_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `vehicle_id` (`vehicle_id`),
+  ADD KEY `dealer_id` (`dealer_id`),
+  ADD KEY `staff_id` (`staff_id`);
+
+--
+-- Chỉ mục cho bảng `salescontracts`
+--
+ALTER TABLE `salescontracts`
+  ADD PRIMARY KEY (`contract_id`),
+  ADD UNIQUE KEY `order_id` (`order_id`),
+  ADD UNIQUE KEY `contract_number` (`contract_number`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `dealer_id` (`dealer_id`);
+
+--
+-- Chỉ mục cho bảng `salesorders`
+--
+ALTER TABLE `salesorders`
+  ADD PRIMARY KEY (`order_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `dealer_id` (`dealer_id`),
+  ADD KEY `salesperson_id` (`salesperson_id`);
+
+--
+-- Chỉ mục cho bảng `testdrives`
+--
+ALTER TABLE `testdrives`
+  ADD PRIMARY KEY (`test_drive_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `vehicle_id` (`vehicle_id`),
+  ADD KEY `dealer_id` (`dealer_id`);
+
+--
+-- Chỉ mục cho bảng `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD KEY `dealer_id` (`dealer_id`);
+
+--
+-- Chỉ mục cho bảng `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD PRIMARY KEY (`vehicle_id`),
+  ADD UNIQUE KEY `uk_vehicle_version_color` (`model_name`,`version`,`color`);
+
+--
+-- AUTO_INCREMENT cho các bảng đã đổ
+--
+
+--
+-- AUTO_INCREMENT cho bảng `customers`
+--
+ALTER TABLE `customers`
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT cho bảng `dealerpayables`
+--
+ALTER TABLE `dealerpayables`
+  MODIFY `payable_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT cho bảng `dealers`
+--
+ALTER TABLE `dealers`
+  MODIFY `dealer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT cho bảng `feedbacks`
+--
+ALTER TABLE `feedbacks`
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT cho bảng `inventory`
+--
+ALTER TABLE `inventory`
+  MODIFY `inventory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT cho bảng `orderitems`
+--
+ALTER TABLE `orderitems`
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT cho bảng `quotations`
+--
+ALTER TABLE `quotations`
+  MODIFY `quotation_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `salescontracts`
+--
+ALTER TABLE `salescontracts`
+  MODIFY `contract_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `salesorders`
+--
+ALTER TABLE `salesorders`
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT cho bảng `testdrives`
+--
+ALTER TABLE `testdrives`
+  MODIFY `test_drive_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT cho bảng `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT cho bảng `vehicles`
+--
+ALTER TABLE `vehicles`
+  MODIFY `vehicle_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- Các ràng buộc cho các bảng đã đổ
+--
+
+--
+-- Các ràng buộc cho bảng `dealerpayables`
+--
+ALTER TABLE `dealerpayables`
+  ADD CONSTRAINT `dealerpayables_ibfk_1` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`dealer_id`);
+
+--
+-- Các ràng buộc cho bảng `feedbacks`
+--
+ALTER TABLE `feedbacks`
+  ADD CONSTRAINT `feedbacks_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`),
+  ADD CONSTRAINT `feedbacks_ibfk_2` FOREIGN KEY (`handled_by`) REFERENCES `users` (`user_id`);
+
+--
+-- Các ràng buộc cho bảng `inventory`
+--
+ALTER TABLE `inventory`
+  ADD CONSTRAINT `inventory_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`vehicle_id`),
+  ADD CONSTRAINT `inventory_ibfk_2` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`dealer_id`);
+
+--
+-- Các ràng buộc cho bảng `orderitems`
+--
+ALTER TABLE `orderitems`
+  ADD CONSTRAINT `orderitems_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `salesorders` (`order_id`),
+  ADD CONSTRAINT `orderitems_ibfk_2` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`vehicle_id`);
+
+--
+-- Các ràng buộc cho bảng `quotations`
+--
+ALTER TABLE `quotations`
+  ADD CONSTRAINT `quotations_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`),
+  ADD CONSTRAINT `quotations_ibfk_2` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`vehicle_id`),
+  ADD CONSTRAINT `quotations_ibfk_3` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`dealer_id`),
+  ADD CONSTRAINT `quotations_ibfk_4` FOREIGN KEY (`staff_id`) REFERENCES `users` (`user_id`);
+
+--
+-- Các ràng buộc cho bảng `salescontracts`
+--
+ALTER TABLE `salescontracts`
+  ADD CONSTRAINT `salescontracts_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `salesorders` (`order_id`),
+  ADD CONSTRAINT `salescontracts_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`),
+  ADD CONSTRAINT `salescontracts_ibfk_3` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`dealer_id`);
+
+--
+-- Các ràng buộc cho bảng `salesorders`
+--
+ALTER TABLE `salesorders`
+  ADD CONSTRAINT `salesorders_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`),
+  ADD CONSTRAINT `salesorders_ibfk_2` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`dealer_id`),
+  ADD CONSTRAINT `salesorders_ibfk_3` FOREIGN KEY (`salesperson_id`) REFERENCES `users` (`user_id`);
+
+--
+-- Các ràng buộc cho bảng `testdrives`
+--
+ALTER TABLE `testdrives`
+  ADD CONSTRAINT `testdrives_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`),
+  ADD CONSTRAINT `testdrives_ibfk_2` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`vehicle_id`),
+  ADD CONSTRAINT `testdrives_ibfk_3` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`dealer_id`);
+
+--
+-- Các ràng buộc cho bảng `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`dealer_id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

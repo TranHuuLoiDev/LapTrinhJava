@@ -16,8 +16,14 @@ public class Promotion {
     @Column(name = "promotion_name", nullable = false, length = 100)
     private String promotionName;
 
+    @Column(name = "promotion_code", unique = true, length = 50)
+    private String promotionCode;
+
     @Column(name = "description", length = 500)
     private String description;
+
+    @Column(name = "discount_type", length = 20)
+    private String discountType; // "Percentage" or "Fixed Amount"
 
     @Column(name = "discount_percentage")
     private Double discountPercentage;
@@ -39,10 +45,12 @@ public class Promotion {
 
     public Promotion() {}
 
-    public Promotion(String promotionName, String description, Double discountPercentage,
-                     BigDecimal discountAmount, LocalDateTime startDate, LocalDateTime endDate) {
+    public Promotion(String promotionName, String promotionCode, String description, String discountType,
+                     Double discountPercentage, BigDecimal discountAmount, LocalDateTime startDate, LocalDateTime endDate) {
         this.promotionName = promotionName;
+        this.promotionCode = promotionCode;
         this.description = description;
+        this.discountType = discountType;
         this.discountPercentage = discountPercentage;
         this.discountAmount = discountAmount;
         this.startDate = startDate;
@@ -56,8 +64,14 @@ public class Promotion {
     public String getPromotionName() { return promotionName; }
     public void setPromotionName(String promotionName) { this.promotionName = promotionName; }
 
+    public String getPromotionCode() { return promotionCode; }
+    public void setPromotionCode(String promotionCode) { this.promotionCode = promotionCode; }
+
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getDiscountType() { return discountType; }
+    public void setDiscountType(String discountType) { this.discountType = discountType; }
 
     public Double getDiscountPercentage() { return discountPercentage; }
     public void setDiscountPercentage(Double discountPercentage) { this.discountPercentage = discountPercentage; }

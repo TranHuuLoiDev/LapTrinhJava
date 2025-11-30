@@ -39,22 +39,21 @@ export function getMenuItems() {
     if (!role) return [];
     
     const allMenus = [
-        { id: 'dashboard', label: 'Dashboard Dealer', icon: '', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
-        { id: 'evmdashboard', label: 'Dashboard EVM', icon: '', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'vehicles', label: 'Quản lý Xe', icon: '', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'customers', label: 'Khách hàng', icon: '', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
-        { id: 'Salesorders', label: 'Đơn hàng', icon: '', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'financing', label: 'Tài chính KH', icon: '', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
-        { id: 'interactions', label: 'Tương tác KH', icon: '', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
-        { id: 'testdrives', label: 'Lái thử', icon: '', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
-        { id: 'feedbacks', label: 'Phản hồi', icon: '', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
-        { id: 'inventory', label: 'Quản lý Kho', icon: '', roles: [ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'inventorytransactions', label: 'Lịch sử Kho', icon: '', roles: [ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'dealers', label: 'Quản lý Đại lý', icon: '', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'dealerpayments', label: 'Thanh toán ĐL', icon: '', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'promotions', label: 'Khuyến mãi', icon: '', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'wholesaleprices', label: 'Giá sỉ', icon: '', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
-        { id: 'reports', label: 'Báo cáo', icon: '', roles: [ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] }
+        { id: 'dashboard', label: 'Dashboard Dealer', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
+        { id: 'evmdashboard', label: 'Dashboard EVM', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'vehicles', label: 'Quản lý Xe', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'vehiclecomparison', label: 'So sánh Xe', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER] },
+        { id: 'customers', label: 'Khách hàng', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
+        { id: 'Salesorders', label: 'Đơn hàng', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'testdrives', label: 'Lái thử', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
+        { id: 'feedbacks', label: 'Phản hồi', roles: [ROLES.DEALER_STAFF, ROLES.DEALER_MANAGER, ROLES.ADMIN] },
+        { id: 'inventory', label: 'Quản lý Kho', roles: [ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'inventorytransactions', label: 'Lịch sử Kho', roles: [ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'dealers', label: 'Quản lý Đại lý', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'dealerpayments', label: 'Thanh toán ĐL', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'promotions', label: 'Khuyến mãi', roles: [ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'wholesaleprices', label: 'Giá sỉ', roles: [ROLES.EVM_STAFF, ROLES.ADMIN] },
+        { id: 'reports', label: 'Báo cáo', roles: [ROLES.DEALER_MANAGER, ROLES.EVM_STAFF, ROLES.ADMIN] }
     ];
     
     return allMenus.filter(menu => menu.roles.includes(role));
